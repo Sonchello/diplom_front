@@ -1,0 +1,84 @@
+/* AddRequestForm.css */
+.add-request-form {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #222629;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  width: 400px;
+  color: white;
+}
+
+.add-request-form h2 {
+  margin-bottom: 20px;
+  color: #86C232;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #86C232;
+}
+
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #86C232;
+  border-radius: 4px;
+  background: #2a2e31;
+  color: white;
+  resize: vertical;
+}
+
+.form-group textarea {
+  min-height: 100px;
+}
+
+.form-group select option {
+  background: #2a2e31;
+  color: white;
+}
+
+.select-location-button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  background-color: #86C232;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.select-location-button:hover {
+  background-color: #75a82b;
+}
+
+.cancel-button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  background-color: #474b4f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.cancel-button:hover {
+  background-color: #3a3e41;
+}

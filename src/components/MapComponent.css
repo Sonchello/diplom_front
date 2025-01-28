@@ -1,0 +1,421 @@
+@import 'leaflet/dist/leaflet.css';
+@import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css');
+
+html,
+body {
+  margin: 0;
+  background-color: #222629; /* Фон страницы */
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.leaflet-popup-content {
+  min-width: 200px;
+  padding: 10px;
+  background-color: #222629; /* Фон всплывающего окна */
+  color: #ffffff; /* Цвет текста всплывающего окна */
+}
+
+.leaflet-popup-content h3 {
+  margin: 0 0 10px 0;
+  color: #222629;
+}
+
+.leaflet-popup-content p {
+  margin: 5px 0;
+  color: #444;
+}
+
+.leaflet-popup-content button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px 16px;
+  background-color: #86C232;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.leaflet-popup-content button:hover {
+  background-color: #75a82b;
+}
+
+.custom-marker {
+  background: none;
+  border: none;
+}
+
+.custom-marker-wrapper {
+  position: relative;
+}
+
+.custom-marker-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50% 50% 50% 0;
+  background: #00cae9;
+  position: absolute;
+  transform: rotate(-45deg);
+  left: 50%;
+  top: 50%;
+  margin: -15px 0 0 -15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.marker-icon {
+  width: 16px;
+  height: 16px;
+  display: block;
+  transform: rotate(45deg);
+  font-size: 16px;
+  text-align: center;
+}
+
+.marker-pin {
+  width: 2px;
+  height: 12px;
+  background: #fff;
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  margin-left: -1px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.custom-marker-cluster {
+  background: white;
+  border: 2px solid #86C232;
+  border-radius: 50%;
+  color: #222629;
+  font-weight: bold;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.custom-marker-cluster span {
+  line-height: 30px;
+}
+
+.map {
+  position: relative;
+  z-index: 1;
+}
+
+/* Стили для кастомных кнопок zoom */
+.custom-zoom-control {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.custom-zoom-control button {
+  width: 40px;
+  height: 40px;
+  background: #86C232; /* Цвет фона кнопок */
+  border: none;
+  border-radius: 50%;
+  color: white; /* Цвет текста кнопок */
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-zoom-control button:hover {
+  background: #75a82b; /* Цвет фона кнопок при наведении */
+}
+/* Стили для кнопки выдвижения меню */
+.toggle-button {
+    width: 40px;
+    height: 40px;
+    background-color: #86C232; /* Новый цвет фона кнопки */
+    border: none;
+    border-radius: 50%;
+    color: white; /* Цвет текста кнопки */
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease; /* Плавное изменение цвета при наведении */
+  }
+  
+  .toggle-button:hover {
+    background-color: #75a82b; /* Цвет фона кнопки при наведении */
+  }
+
+.create-request-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  padding: 15px 30px;  /* Увеличиваем padding */
+  background-color: #86C232;
+  color: white;
+  border: none;
+  border-radius: 8px;  /* Немного увеличиваем скругление */
+  cursor: pointer;
+  font-size: 18px;    /* Увеличиваем размер шрифта */
+  font-weight: bold;   /* Делаем шрифт жирным */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* Усиливаем тень */
+  transition: all 0.3s ease;
+}
+
+.create-request-button:hover {
+  background-color: #75a82b;
+  transform: translateY(-2px);  /* Добавляем эффект при наведении */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Добавляем эффект при нажатии */
+.create-request-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Добавим стили для контейнера карты */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.request-form-popup {
+  min-width: 300px;
+  padding: 15px;
+  background-color: white;
+  border-radius: 8px;
+}
+
+.request-form-popup h3 {
+  margin: 0 0 15px 0;
+  color: #222629;
+  text-align: center;
+  font-size: 18px;
+}
+
+.request-form-popup .form-group {
+  margin-bottom: 15px;
+}
+
+.request-form-popup label {
+  display: block;
+  margin-bottom: 8px;
+  color: #222629;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.request-form-popup textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+  font-size: 14px;
+  color: #333;
+  background-color: #f8f9fa;
+}
+
+.request-form-popup select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  background-color: #f8f9fa;
+}
+
+.urgency-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.urgency-button {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  opacity: 0.7;
+}
+
+.urgency-button.active {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.urgency-button.low {
+  background-color: #28a745;
+  color: white;
+}
+
+.urgency-button.medium {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.urgency-button.high {
+  background-color: #dc3545;
+  color: white;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.form-buttons button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.submit-button {
+  background-color: #86C232;
+  color: white;
+}
+
+.submit-button:hover {
+  background-color: #75a82b;
+}
+
+.cancel-button {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.cancel-button:hover {
+  background-color: #c0392b;
+}
+
+.request-popup {
+  min-width: 200px;
+  padding: 10px;
+}
+
+.request-popup h3 {
+  margin: 0 0 10px 0;
+  color: #222629;
+  border-bottom: 2px solid #86C232;
+  padding-bottom: 5px;
+}
+
+.request-popup .request-category {
+  font-weight: bold;
+  margin: 5px 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.request-popup .urgency {
+  padding: 5px 10px;
+  border-radius: 4px;
+  color: white;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.request-popup .urgency.low {
+  background-color: #28a745;
+}
+
+.request-popup .urgency.medium {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.request-popup .urgency.high {
+  background-color: #dc3545;
+}
+
+/* Стили для select с эмодзи */
+.request-form-popup select option {
+  font-size: 16px;
+  padding: 8px;
+}
+
+.category-select {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.category-icon {
+  font-size: 1.2em;
+  margin-right: 5px;
+}
+
+.custom-pin {
+  background: none;
+  border: none;
+}
+
+.custom-pin span {
+  display: block;
+}
+
+.legend-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: white;
+}
+
+.legend-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.legend-text {
+  font-size: 14px;
+  color: #333;
+}

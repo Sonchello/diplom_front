@@ -1,0 +1,301 @@
+/* Основные стили для меню */
+.sidebar {
+  position: absolute;
+  width: 438px;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: #222629; /* Фон меню */
+  border-right: 1px solid #f1f5f8;
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px;
+  box-shadow: 0 0 10px #7f97a1;
+  direction: ltr;
+  overflow: auto;
+  z-index: 1000;
+  transition: transform 0.3s ease-in-out; /* Анимация для плавного открытия/закрытия */
+}
+
+/* Стили для открытого меню */
+.sidebar.open {
+  transform: translateX(0); /* Меню видно */
+}
+
+/* Стили для закрытого меню */
+.sidebar.closed {
+  transform: translateX(-100%); /* Меню скрыто */
+}
+
+/* Стили для кнопки управления */
+.toggle-button {
+  width: 40px;
+  height: 40px;
+  background-color: #86C232; /* Цвет кнопки */
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Стили для заголовка */
+.heading {
+  height: auto;
+  border-bottom: 1px solid #86C232; /* Цвет границы заголовка */
+  color: #ffffff; /* Цвет текста заголовка */
+  padding: 25px;
+  text-align: center;
+}
+
+/* Стили для кнопок меню */
+.button {
+  width: fit-content;
+  margin: 0 3px 0 3px;
+  background: #222629; /* Фон кнопок */
+  border: 0;
+  border-radius: 999px;
+  box-sizing: border-box;
+  color: #f1f5f8; /* Цвет текста кнопок */
+  cursor: pointer;
+  font-family: 'brandon-grotesque', 'Avenir Next', 'Helvetica Neue',
+  'Helvetica', 'Arial', 'sans-serif';
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 24px;
+  opacity: 1;
+  outline: 0 solid transparent;
+  padding: 8px 16px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  transition: background-color 250ms linear;
+  word-break: break-word;
+}
+
+/* Стили для активной кнопки меню */
+.button_active {
+  width: fit-content;
+  margin: 0 3px 0 3px;
+  background: #86C232; /* Цвет активной кнопки */
+  border: 0;
+  border-radius: 999px;
+  box-sizing: border-box;
+  color: #ffffff; /* Цвет текста активной кнопки */
+  cursor: pointer;
+  font-family: 'brandon-grotesque', 'Avenir Next', 'Helvetica Neue',
+  'Helvetica', 'Arial', 'sans-serif';
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 24px;
+  opacity: 1;
+  outline: 0 solid transparent;
+  padding: 8px 16px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  transition: background-color 250ms linear;
+  word-break: break-word;
+}
+
+/* Стили для блока сортировки */
+.sort {
+  border-bottom: 1px solid #86C232; /* Цвет границы блока сортировки */
+  color: #ffffff; /* Цвет текста блока сортировки */
+  font-family: 'brandon-grotesque', 'Avenir Next', 'Helvetica Neue',
+  'Helvetica', 'Arial', 'sans-serif';
+  font-weight: 500;
+  font-size: 14px;
+  padding: 20px;
+  text-align: center;
+}
+
+/* Стили для фона блока сортировки */
+.sort_back {
+  width: 235px;
+  margin: auto;
+  background-color: #222629; /* Фон блока сортировки */
+  border: 5px solid #222629;
+  border-radius: 50px;
+  box-shadow: 0 1.3px 5.4px rgba(1 85 101 / 15%),
+  0 4.5px 18.1px rgba(1 85 101 / 5%), 0 20px 81px rgba(1 85 101 / 2.5%);
+}
+
+/* Стили для вкладок */
+.tab {
+  width: fit-content;
+  margin: auto;
+  background-color: #222629; /* Фон вкладок */
+  border: 5px solid #222629;
+  border-radius: 50px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 10px;
+}
+
+/* Стили для кнопки сортировки */
+.sort_button {
+  width: fit-content;
+  margin: 0 3px 0 3px;
+  background: #86C232; /* Цвет кнопки сортировки */
+  border: 0;
+  border-radius: 999px;
+  box-sizing: border-box;
+  color: #ffffff; /* Цвет текста кнопки сортировки */
+  cursor: pointer;
+  font-family: 'brandon-grotesque', 'Avenir Next', 'Helvetica Neue',
+  'Helvetica', 'Arial', 'sans-serif';
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 24px;
+  opacity: 1;
+  outline: 0 solid transparent;
+  padding: 8px 16px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  word-break: break-word;
+}
+
+/* Стили для темной темы */
+.sidebar.dark_theme {
+  background-color: #1e2122;
+  border-color: #253034;
+  box-shadow: 0 1.3px 5.4px rgba(0 7 8 / 50%),
+  0 4.5px 18.1px rgba(0 7 8 / 30%), 0 20px 81px rgba(0 7 8 / 10%);
+}
+
+.heading.dark_theme {
+  border-color: #253034;
+}
+
+.sort.dark_theme {
+  border-bottom: 1px solid #253034;
+}
+
+.sort_back.dark_theme {
+  background-color: rgb(57, 57, 57);
+  border: 5px solid  rgb(57, 57, 57);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+  color: #f1f5f8d4;
+}
+
+.tab.dark_theme {
+  background-color: rgb(57, 57, 57);
+  border: 5px solid rgb(57, 57, 57);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 438px) {
+  .sidebar {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    overflow: auto;
+    background-color: #222629;
+    border-right: 0px solid rgba(0, 0, 0, 0.25);
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    direction: ltr;
+    z-index: 1000;
+  }
+}
+
+.content {
+  height: 100%;
+  direction: ltr;
+}
+/* Стили для кнопки выдвижения меню */
+.toggle-button {
+  width: 40px;
+  height: 40px;
+  background-color: #86C232; /* Новый цвет фона кнопки */
+  border: none;
+  border-radius: 50%;
+  color: white; /* Цвет текста кнопки */
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease; /* Плавное изменение цвета при наведении */
+}
+
+.toggle-button:hover {
+  background-color: #75a82b; /* Цвет фона кнопки при наведении */
+}
+/* Стили для аватарки пользователя */
+.user-avatar {
+  width: 120px; /* Увеличиваем ширину */
+  height: 120px; /* Увеличиваем высоту */
+  border-radius: 50%; /* Делаем круглой */
+  border: 3px solid #86C232; /* Добавляем рамку */
+  object-fit: cover; /* Чтобы изображение не искажалось */
+  margin-bottom: 15px; /* Отступ снизу */
+}
+
+/* Стили для заголовка профиля */
+.heading {
+  text-align: center; /* Выравниваем текст по центру */
+  margin-bottom: 20px; /* Отступ снизу */
+}
+
+.heading h3 {
+  margin: 10px 0 5px; /* Отступы для имени */
+  font-size: 20px; /* Увеличиваем размер шрифта */
+  color: #ffffff; /* Цвет текста */
+}
+
+.heading p {
+  margin: 0; /* Убираем отступы */
+  font-size: 14px; /* Размер шрифта для email */
+  color: #cccccc; /* Цвет текста */
+}
+/* Стили для аватарки пользователя */
+.user-avatar {
+  width: 140px; /* Увеличиваем ширину круга */
+  height: 140px; /* Увеличиваем высоту круга */
+  border-radius: 50%; /* Делаем круглой */
+  border: 7px solid #86C232; /* Добавляем рамку */
+  object-fit: cover; /* Чтобы изображение заполнило весь круг */
+  margin-bottom: 15px; /* Отступ снизу */
+}
+
+/* Стили для заголовка профиля */
+.heading {
+  text-align: center; /* Выравниваем текст по центру */
+  margin-bottom: 20px; /* Отступ снизу */
+}
+
+.heading h3 {
+  margin: 10px 0 5px; /* Отступы для имени */
+  font-size: 20px; /* Увеличиваем размер шрифта */
+  color: #ffffff; /* Цвет текста */
+}
+
+.heading p {
+  margin: 0; /* Убираем отступы */
+  font-size: 14px; /* Размер шрифта для email */
+  color: #cccccc; /* Цвет текста */
+}
+  
+  /* Sidebar.css */
+  .add-request-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background: #28a745;
+    color: white;
+    cursor: pointer;
+    width: 100%;
+  }
+  
+  .add-request-button:hover {
+    background: #218838;
+  }
