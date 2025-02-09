@@ -25,4 +25,4 @@ public class AuthController {
         String password = credentials.get("password");
         return authService.loginUser(email, password);
     }
-} 
+}

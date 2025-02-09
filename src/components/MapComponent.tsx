@@ -14,7 +14,12 @@ import {
   faQuestion,
   faPlus,
   faBroom,
-  faHandHoldingDollar
+  faHandHoldingDollar,
+  faTag,
+  faUser,
+  faInfoCircle,
+  faExclamationTriangle,
+  faCheck
 } from '@fortawesome/free-solid-svg-icons';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 
@@ -26,22 +31,37 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
-// Функция для создания кастомной иконки маркера
+// Обновляем функцию создания кастомной иконки
 const createCustomIcon = (category: string) => {
-  return new L.Icon({
-    iconUrl: `/images/markers/marker-${category}.png`,
-    iconSize: [40, 40],
-    iconAnchor: [20, 40],
-    popupAnchor: [0, -40]
+  const defaultIcon = new L.Icon({
+    iconUrl: require('leaflet/dist/images/marker-icon.png'),
+    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+    shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
   });
+
+  try {
+    return new L.Icon({
+      iconUrl: `/images/markers/marker-${category}.png`,
+      iconSize: [90, 90],
+      iconAnchor: [45, 90],
+      popupAnchor: [0, -90]
+    });
+  } catch (error) {
+    console.warn(`Failed to load custom icon for category ${category}, using default`);
+    return defaultIcon;
+  }
 };
 
-// Функция для создания иконки кластера
+// Обновляем функцию создания иконки кластера
 const createClusterIcon = (cluster: any) => {
   return L.divIcon({
-    html: `<span>${cluster.getChildCount()}</span>`,
-    className: 'custom-marker-cluster',
-    iconSize: L.point(30, 30, true)
+    html: `<div class="custom-marker-cluster"><span>${cluster.getChildCount()}</span></div>`,
+    className: '',
+    iconSize: L.point(70, 70, true)
   });
 };
 
@@ -76,7 +96,7 @@ const categories = [
     color: '#2196F3'
   },
   {
-    value: 'medical',
+    value: 'medical',        // изменено с 'new' на 'medical'
     label: 'Медицинская помощь',
     icon: faMedkit,
     markerIcon: createCustomIcon('medical'),
@@ -98,8 +118,24 @@ const categories = [
   }
 ];
 
-// Иконка для нового маркера
-const newMarkerIcon = createCustomIcon('new');
+// Создаем стандартную красную метку
+const newMarkerIcon = new L.Icon({
+  iconUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+  iconSize: [35, 57],
+  iconAnchor: [17, 57],
+  popupAnchor: [1, -57],
+  shadowSize: [57, 57]
+});
+
+// Создаем иконку для маркера пользователя
+const userLocationIcon = L.divIcon({
+  className: 'user-location-marker',
+  html: '<div class="user-marker-inner"></div>',
+  iconSize: [24, 24],
+  iconAnchor: [12, 12]
+});
 
 interface Request {
   id: number;
@@ -109,12 +145,16 @@ interface Request {
   status: string;
   urgency?: 'low' | 'medium' | 'high';
   category: string;
+  userName: string;
+  userId: number;
+  createdAt: string;
 }
 
 interface MapComponentProps {
   requests: Request[];
   onRequestAdded: () => void;
   userId: number;
+  userLocation: {latitude: number; longitude: number} | null;
 }
 
 // Компонент для обработки кликов на карте
@@ -125,7 +165,7 @@ const MapClickHandler: React.FC<{ onClick: (e: L.LeafletMouseEvent) => void }> =
   return null;
 };
 
-const MapComponent: React.FC<MapComponentProps> = ({ requests, onRequestAdded, userId }) => {
+const MapComponent: React.FC<MapComponentProps> = ({ requests, onRequestAdded, userId, userLocation }) => {
   const mapRef = React.useRef<L.Map | null>(null);
   const [selectedPosition, setSelectedPosition] = useState<[number, number] | null>(null);
   const [isSelectingLocation, setIsSelectingLocation] = useState(false);
@@ -219,6 +259,102 @@ const MapComponent: React.FC<MapComponentProps> = ({ requests, onRequestAdded, u
     }
   };
 
+  const handleHelpProvided = async (requestId: number) => {
+    if (!userId || userId === 0) {
+      console.error('UserId is invalid:', userId);
+      alert('Ошибка: пользователь не авторизован. Пожалуйста, войдите снова.');
+      window.location.href = '/login';
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Ошибка: токен не найден. Пожалуйста, войдите снова.');
+        window.location.href = '/login';
+        return;
+      }
+
+      console.log('Sending help provided request with userId:', userId);
+      
+      const response = await axios.post(
+        `http://localhost:8080/api/requests/${requestId}/help`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        }
+      );
+      
+      console.log('Response:', response.data);
+      onRequestAdded();
+      setIsSelectingLocation(false);
+      setSelectedPosition(null);
+      setDescription('');
+      setCategory('');
+      setUrgency('low');
+      
+      alert('Помощь успешно оказана!');
+    } catch (error: any) {
+      console.error('Ошибка при оказании помощи:', error);
+      console.error('Детали ошибки:', error.response?.data);
+      
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        alert('Сессия истекла. Пожалуйста, войдите снова.');
+        window.location.href = '/login';
+        return;
+      }
+      
+      alert('Ошибка при оказании помощи: ' + (error.response?.data || error.message));
+    }
+  };
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      // Запрашиваем местоположение с высокой точностью
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          if (mapRef.current) {
+            // Создаем маркер пользователя
+            const userMarker = L.marker(
+              [latitude, longitude],
+              { 
+                icon: userLocationIcon,
+                zIndexOffset: 1000
+              }
+            )
+              .addTo(mapRef.current)
+              .bindPopup('<div class="user-location-popup">Вы здесь</div>');
+
+            // Центрируем карту на местоположении пользователя
+            mapRef.current.setView([latitude, longitude], 15);  // увеличиваем зум до 15
+
+            // Очищаем маркер при размонтировании
+            return () => {
+              if (mapRef.current) {
+                userMarker.remove();
+              }
+            };
+          }
+        },
+        (error) => {
+          console.error('Ошибка получения геолокации:', error);
+          alert('Не удалось определить ваше местоположение. Пожалуйста, разрешите доступ к геолокации в настройках браузера.');
+        },
+        {
+          enableHighAccuracy: true,  // Включаем высокую точность
+          timeout: 5000,             // Таймаут в 5 секунд
+          maximumAge: 0              // Всегда получаем свежие данные
+        }
+      );
+    } else {
+      alert('Ваш браузер не поддерживает геолокацию');
+    }
+  }, [mapRef.current]); // Перезапускаем эффект только при изменении mapRef.current
+
   return (
     <div style={{ position: 'relative', height: '100%', width: '100%', flex: 1 }}>
       {!isSelectingLocation && (
@@ -268,18 +404,48 @@ const MapComponent: React.FC<MapComponentProps> = ({ requests, onRequestAdded, u
                 <Popup>
                   <div className="request-popup">
                     <h3>
-                      <FontAwesomeIcon icon={categories.find(cat => cat.value === request.category)?.icon || faQuestion} /> 
-                      {request.category}
+                      <FontAwesomeIcon icon={categories.find(cat => cat.value === request.category)?.icon || faQuestion} />
+                      {categories.find(cat => cat.value === request.category)?.label || 'Неизвестная категория'}
                     </h3>
-                    <p>{request.description}</p>
-                    <p>Статус: {request.status}</p>
+                    
+                    <div className="category-info">
+                      <FontAwesomeIcon icon={faTag} />
+                      Категория: {categories.find(cat => cat.value === request.category)?.label}
+                    </div>
+                    
+                    <div className="description">
+                      <strong>Описание:</strong>
+                      <p>{request.description}</p>
+                    </div>
+                    
+                    <div className="user-info">
+                      <FontAwesomeIcon icon={faUser} /> Автор: {request.userName}
+                    </div>
+                    
+                    <div className="status">
+                      <FontAwesomeIcon icon={faInfoCircle} /> Статус: {
+                        request.status === 'ACTIVE' ? 'Активный' :
+                        request.status === 'COMPLETED' ? 'Выполнен' : 
+                        request.status
+                      }
+                    </div>
+                    
                     {request.urgency && (
-                      <p className={`urgency ${request.urgency}`}>
-                        Срочность: {
+                      <div className={`urgency ${request.urgency}`}>
+                        <FontAwesomeIcon icon={faExclamationTriangle} /> Срочность: {
                           request.urgency === 'low' ? 'Низкая' :
                           request.urgency === 'medium' ? 'Средняя' : 'Высокая'
                         }
-                      </p>
+                      </div>
+                    )}
+                    
+                    {request.status === 'ACTIVE' && (
+                      <button 
+                        className="help-button"
+                        onClick={() => handleHelpProvided(request.id)}
+                      >
+                        <FontAwesomeIcon icon={faCheck} /> Помощь оказана
+                      </button>
                     )}
                   </div>
                 </Popup>
@@ -290,7 +456,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ requests, onRequestAdded, u
           {isSelectingLocation && selectedPosition && (
             <Marker
               position={selectedPosition}
-              icon={newMarkerIcon}
+              icon={category ? categories.find(cat => cat.value === category)?.markerIcon : newMarkerIcon}
               draggable={true}
               eventHandlers={{
                 dragend: (e) => {

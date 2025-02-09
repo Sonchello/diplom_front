@@ -21,10 +21,10 @@ public class RequestController {
     public ResponseEntity<?> createRequest(@RequestBody Map<String, Object> payload) {
         try {
             System.out.println("Received payload: " + payload);
-            
+
             Long userId = Long.parseLong(payload.get("userId").toString());
             System.out.println("Parsed userId: " + userId);
-            
+
             String description = (String) payload.get("description");
             String category = (String) payload.get("category");
             Double latitude = Double.parseDouble(payload.get("latitude").toString());
@@ -66,4 +66,4 @@ public class RequestController {
     public List<Request> getHelpedRequestsByUser(@PathVariable Long userId) {
         return requestService.getHelpedRequestsByUser(userId);
     }
-} 
+}

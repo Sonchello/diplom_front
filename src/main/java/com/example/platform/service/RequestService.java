@@ -23,7 +23,7 @@ public class RequestService {
     public Request createRequest(Long userId, Request request) {
         try {
             System.out.println("Creating request for userId: " + userId);
-            
+
             if (userId == null || userId == 0) {
                 throw new RuntimeException("Invalid userId: " + userId);
             }
@@ -40,20 +40,20 @@ public class RequestService {
                         System.out.println("User not found for id: " + userId);
                         return new RuntimeException("User not found for id: " + userId);
                     });
-            
+
             System.out.println("Found user: " + user.getId() + ", " + user.getEmail());
-            
+
             request.setUser(user);
             request.setCreationDate(LocalDateTime.now());
             request.setStatus("ACTIVE");
-            
+
             if (request.getDescription() == null || request.getDescription().trim().isEmpty()) {
                 throw new RuntimeException("Description is required");
             }
             if (request.getCategory() == null || request.getCategory().trim().isEmpty()) {
                 throw new RuntimeException("Category is required");
             }
-            
+
             Request savedRequest = requestRepository.save(request);
             System.out.println("Request saved successfully with id: " + savedRequest.getId());
             return savedRequest;
@@ -84,6 +84,4 @@ public class RequestService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return user.getHelpedRequests();
     }
-
-    // ... остальные методы остаются без изменений ...
-} 
+}

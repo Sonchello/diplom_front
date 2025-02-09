@@ -26,10 +26,11 @@ body {
 }
 
 .leaflet-popup-content {
-  min-width: 200px;
-  padding: 10px;
-  background-color: #222629; /* Фон всплывающего окна */
-  color: #ffffff; /* Цвет текста всплывающего окна */
+  min-width: 400px;  /* делаем попап еще шире */
+  margin: 0;
+  padding: 0;
+  background-color: white;
+  color: #333;
 }
 
 .leaflet-popup-content h3 {
@@ -106,19 +107,19 @@ body {
 
 .custom-marker-cluster {
   background: white;
-  border: 2px solid #86C232;
+  border: 4px solid #86C232;  /* увеличиваем толщину границы */
   border-radius: 50%;
   color: #222629;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 24px;           /* увеличиваем размер шрифта */
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);  /* усиливаем тень */
 }
 
 .custom-marker-cluster span {
-  line-height: 30px;
+  line-height: 70px;  /* обновляем line-height в соответствии с новым размером */
 }
 
 .map {
@@ -212,52 +213,60 @@ body {
   z-index: 1;
 }
 
+/* Стили для формы создания запроса */
 .request-form-popup {
-  min-width: 300px;
-  padding: 15px;
+  min-width: 400px;  /* делаем форму шире */
+  padding: 25px;     /* увеличиваем отступы */
   background-color: white;
   border-radius: 8px;
 }
 
 .request-form-popup h3 {
-  margin: 0 0 15px 0;
+  margin: 0 0 25px 0;
   color: #222629;
   text-align: center;
-  font-size: 18px;
+  font-size: 24px;    /* увеличиваем размер заголовка */
+  font-weight: bold;
 }
 
 .request-form-popup .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 25px;
 }
 
 .request-form-popup label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   color: #222629;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 18px;    /* увеличиваем размер текста метки */
 }
 
 .request-form-popup textarea {
   width: 100%;
-  min-height: 100px;
-  padding: 10px;
+  min-height: 150px;  /* увеличиваем высоту текстового поля */
+  padding: 15px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 8px;
   resize: vertical;
-  font-size: 14px;
+  font-size: 18px;    /* увеличиваем размер текста */
+  line-height: 1.5;
   color: #333;
   background-color: #f8f9fa;
 }
 
 .request-form-popup select {
   width: 100%;
-  padding: 10px;
+  padding: 15px;
   border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 18px;    /* увеличиваем размер текста */
   color: #333;
   background-color: #f8f9fa;
+}
+
+.request-form-popup select option {
+  font-size: 18px;    /* увеличиваем размер текста в опциях */
+  padding: 15px;
 }
 
 .urgency-buttons {
@@ -268,11 +277,12 @@ body {
 
 .urgency-button {
   flex: 1;
-  padding: 8px;
+  padding: 12px;      /* увеличиваем padding */
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
+  font-size: 16px;    /* увеличиваем размер текста */
   transition: all 0.3s ease;
   opacity: 0.7;
 }
@@ -305,11 +315,12 @@ body {
 
 .form-buttons button {
   flex: 1;
-  padding: 10px;
+  padding: 15px;      /* увеличиваем padding */
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
+  font-size: 18px;    /* увеличиваем размер текста */
   transition: all 0.3s ease;
 }
 
@@ -332,50 +343,105 @@ body {
 }
 
 .request-popup {
-  min-width: 200px;
-  padding: 10px;
+  min-width: 300px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 .request-popup h3 {
-  margin: 0 0 10px 0;
+  margin: 0 0 15px 0;
   color: #222629;
   border-bottom: 2px solid #86C232;
-  padding-bottom: 5px;
-}
-
-.request-popup .request-category {
-  font-weight: bold;
-  margin: 5px 0;
+  padding-bottom: 10px;
+  font-size: 22px;  /* увеличиваем заголовок */
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 10px;
+}
+
+.request-popup p {
+  margin: 10px 0;
+  color: #333;
+  font-size: 16px;  /* увеличиваем текст описания */
+  line-height: 1.6;
+}
+
+.request-popup .category-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+  font-weight: bold;
+  color: #444;
+  font-size: 18px;  /* увеличиваем текст категории */
+}
+
+.request-popup .description {
+  background-color: #f5f5f5;
+  padding: 10px;
+  border-radius: 4px;
+  margin: 10px 0;
+}
+
+.request-popup .description strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-size: 18px;  /* увеличиваем заголовок описания */
+}
+
+.request-popup .description p {
+  margin: 0;
+  color: #444;
+  font-size: 16px;  /* увеличиваем текст описания */
+  line-height: 1.6;
+}
+
+.request-popup .user-info {
+  font-style: italic;
+  color: #666;
+  margin: 10px 0;
+  font-size: 16px;  /* увеличиваем информацию о пользователе */
 }
 
 .request-popup .urgency {
+  display: inline-block;
   padding: 5px 10px;
   border-radius: 4px;
   color: white;
   font-weight: bold;
-  margin-top: 10px;
+  margin: 10px 0;
+  font-size: 16px;  /* увеличиваем текст срочности */
 }
 
-.request-popup .urgency.low {
-  background-color: #28a745;
+.request-popup .help-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #86C232;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 15px;
+  transition: background-color 0.3s;
 }
 
-.request-popup .urgency.medium {
-  background-color: #ffc107;
-  color: #000;
+.request-popup .help-button:hover {
+  background-color: #75a82b;
 }
 
-.request-popup .urgency.high {
-  background-color: #dc3545;
-}
-
-/* Стили для select с эмодзи */
-.request-form-popup select option {
-  font-size: 16px;
-  padding: 8px;
+.request-popup .status {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-weight: bold;
+  margin: 10px 0;
+  background-color: #f0f0f0;
+  color: #444;
+  font-size: 16px;  /* увеличиваем текст статуса */
 }
 
 .category-select {
@@ -418,4 +484,205 @@ body {
 .legend-text {
   font-size: 14px;
   color: #333;
+}
+
+/* Стили для контейнера попапа Leaflet */
+.leaflet-popup-content-wrapper {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.3);
+  padding: 0;
+}
+
+.leaflet-popup-content {
+  min-width: 350px;  /* увеличиваем ширину */
+  margin: 0;
+  padding: 0;
+  background-color: white;
+  color: #333;
+}
+
+/* Стили для контента попапа */
+.request-popup {
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+}
+
+.request-popup h3 {
+  margin: 0 0 20px 0;
+  color: #333;
+  border-bottom: 2px solid #86C232;
+  padding-bottom: 15px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.request-popup .category-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 15px 0;
+  font-weight: bold;
+  color: #444;
+  font-size: 16px;
+}
+
+.request-popup .description {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+  margin: 15px 0;
+  border: 1px solid #e9ecef;
+}
+
+.request-popup .description strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-size: 16px;
+}
+
+.request-popup .description p {
+  margin: 0;
+  color: #444;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.request-popup .user-info {
+  font-style: italic;
+  color: #555;
+  margin: 15px 0;
+  font-size: 15px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.request-popup .status {
+  display: inline-block;
+  padding: 8px 15px;
+  border-radius: 6px;
+  font-weight: bold;
+  margin: 15px 0;
+  background-color: #e9ecef;
+  color: #444;
+  font-size: 15px;
+}
+
+.request-popup .urgency {
+  display: inline-block;
+  padding: 8px 15px;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  margin: 15px 0;
+  font-size: 15px;
+  width: 100%;
+  text-align: center;
+}
+
+.request-popup .urgency.low {
+  background-color: #28a745;
+}
+
+.request-popup .urgency.medium {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.request-popup .urgency.high {
+  background-color: #dc3545;
+}
+
+.request-popup .help-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #86C232;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+
+.request-popup .help-button:hover {
+  background-color: #75a82b;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.request-popup .help-button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Стили для маркера местоположения пользователя */
+.user-location-marker {
+  width: 40px !important;
+  height: 40px !important;
+  background: none !important;
+  border: none !important;
+}
+
+.user-marker-inner {
+  width: 40px;
+  height: 40px;
+  background-color: #ff4444;  /* меняем на красный цвет */
+  border: 4px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(255, 68, 68, 0.8);  /* красное свечение */
+  position: relative;
+}
+
+.user-marker-inner::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid #ff4444;  /* красная пульсация */
+  opacity: 0.6;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+}
+
+.user-location-popup {
+  padding: 12px 20px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff4444;  /* красный текст */
+  text-align: center;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(255, 68, 68, 0.3);
+}
+
+/* Обновляем стили для маркера пользователя */
+.leaflet-marker-icon {
+  transition: all 0.3s ease;
+}
+
+.leaflet-marker-icon:hover {
+  transform: scale(1.1);
 }

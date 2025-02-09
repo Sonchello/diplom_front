@@ -4,6 +4,7 @@ import com.example.platform.model.User;
 import com.example.platform.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +18,7 @@ public class UserService {
     public User findByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-        
+
         // Инициализируем списки, если они null
         if (user.getCreatedRequests() == null) {
             user.setCreatedRequests(new ArrayList<>());
@@ -25,7 +26,7 @@ public class UserService {
         if (user.getHelpedRequests() == null) {
             user.setHelpedRequests(new ArrayList<>());
         }
-        
+
         return user;
     }
 
@@ -51,5 +52,18 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    // ... остальные методы ...
-} 
+    @Transactional
+    public User updateUser(User user) {
+        // Проверяем существование пользователя
+        User existingUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+        
+        // Обновляем только разрешенные поля
+        existingUser.setName(user.getName());
+        existingUser.setAvatarUrl(user.getAvatarUrl());
+        existingUser.setBirthDate(user.getBirthDate());
+        
+        // Сохраняем обновленного пользователя
+        return userRepository.save(existingUser);
+    }
+}
