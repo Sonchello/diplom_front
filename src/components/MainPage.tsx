@@ -32,7 +32,9 @@ const MainPage: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [userLocation, setUserLocation] = useState<{latitude: number; longitude: number} | null>(null);
   const [watchId, setWatchId] = useState<number | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
   const navigate = useNavigate();
+  const mapRef = React.useRef<L.Map | null>(null);
 
   useEffect(() => {
     const handleGeolocationError = (error: GeolocationPositionError) => {
@@ -238,6 +240,13 @@ const MainPage: React.FC = () => {
     });
   }, [requests, userLocation]);
 
+  const handleRequestClick = (request: Request) => {
+    setSelectedRequest(request);
+    if (mapRef.current) {
+      mapRef.current.setView([request.latitude, request.longitude], 16);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="loading-screen">
@@ -256,20 +265,14 @@ const MainPage: React.FC = () => {
       )}
 
       <Sidebar
-        requests={sortedRequests.map(request => ({
-          ...request,
-          distance: userLocation ? calculateDistance(
-            userLocation.latitude,
-            userLocation.longitude,
-            request.latitude,
-            request.longitude
-          ) : undefined
-        }))}
+        requests={sortedRequests}
         isOpen={isSidebarOpen}
         onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
         currentUser={currentUser}
         onAddRequest={() => {}}
         onUserUpdate={handleUserUpdate}
+        onRequestClick={handleRequestClick}
+        onRequestDelete={handleRequestAdded}
       />
 
       <MapComponent 
@@ -277,6 +280,8 @@ const MainPage: React.FC = () => {
         onRequestAdded={handleRequestAdded}
         userId={currentUser?.id || 0}
         userLocation={userLocation}
+        selectedRequest={selectedRequest}
+        mapRef={mapRef}
       />
     </div>
   );

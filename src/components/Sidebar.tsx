@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './Sidebar.css';
 import EditProfileModal from './EditProfileModal';
+import axios from 'axios';
 
 const DEFAULT_AVATAR_URL = 'https://abrakadabra.fun/uploads/posts/2021-12/thumbs/1640528715_49-abrakadabra-fun-p-serii-chelovek-na-avu-56.jpg';
 
@@ -14,6 +15,8 @@ interface Request {
   category: string;
   userName: string;
   urgency?: 'low' | 'medium' | 'high';
+  userId: number;
+  createdAt: string;
 }
 
 interface User {
@@ -31,9 +34,11 @@ interface SidebarProps {
   currentUser: User | null;
   onAddRequest: () => void;
   onUserUpdate?: () => void;
+  onRequestClick?: (request: Request) => void;
+  onRequestDelete?: (requestId: number) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ requests, isOpen, onToggle, currentUser, onAddRequest, onUserUpdate }) => {
+const Sidebar: React.FC<SidebarProps> = ({ requests, isOpen, onToggle, currentUser, onAddRequest, onUserUpdate, onRequestClick, onRequestDelete }) => {
   const avatarUrl = currentUser?.avatarUrl 
     ? `http://localhost:8080${currentUser.avatarUrl}` 
     : DEFAULT_AVATAR_URL;
@@ -45,10 +50,30 @@ const Sidebar: React.FC<SidebarProps> = ({ requests, isOpen, onToggle, currentUs
 
   const categories = [
     { value: 'all', label: 'Все категории' },
-    { value: 'cleaning', label: 'Уборка' },
-    { value: 'food', label: 'Еда' },
-    { value: 'transport', label: 'Транспорт' },
-    { value: 'medical', label: 'Медицинская помощь' },
+    { 
+      value: 'ecological', 
+      label: 'Экология',
+      subcategories: [
+        { value: 'cleaning', label: 'Уборка территории' },
+        { value: 'planting', label: 'Посадка деревьев' }
+      ]
+    },
+    { 
+      value: 'social', 
+      label: 'Социальная помощь',
+      subcategories: [
+        { value: 'clothing', label: 'Одежда' },
+        { value: 'food', label: 'Еда' }
+      ]
+    },
+    { 
+      value: 'infrastructure', 
+      label: 'Инфраструктура',
+      subcategories: [
+        { value: 'transport', label: 'Транспорт' },
+        { value: 'fundraising', label: 'Сбор средств' }
+      ]
+    },
     { value: 'other', label: 'Другое' }
   ];
 
@@ -63,18 +88,24 @@ const Sidebar: React.FC<SidebarProps> = ({ requests, isOpen, onToggle, currentUs
     const categoryMatch = selectedCategory === 'all' || request.category === selectedCategory;
     const distanceMatch = !request.distance || (request.distance * 1000) <= maxDistance;
     const urgencyMatch = selectedUrgency === 'all' || request.urgency === selectedUrgency;
-    return categoryMatch && distanceMatch && urgencyMatch;
+    const userMatch = activeTab === 'my' ? request.userId === currentUser?.id : true;
+    return categoryMatch && distanceMatch && urgencyMatch && userMatch;
   });
 
   const getCategoryLabel = (category: string): string => {
-    const categories: { [key: string]: string } = {
-      'cleaning': 'Уборка',
+    const categoryMap: { [key: string]: string } = {
+      'ecological': 'Экология',
+      'cleaning': 'Уборка территории',
+      'planting': 'Посадка деревьев',
+      'social': 'Социальная помощь',
+      'clothing': 'Одежда',
       'food': 'Еда',
+      'infrastructure': 'Инфраструктура',
       'transport': 'Транспорт',
-      'medical': 'Медицинская помощь',
+      'fundraising': 'Сбор средств',
       'other': 'Другое'
     };
-    return categories[category] || category;
+    return categoryMap[category] || category;
   };
 
   const getStatusLabel = (status: string): string => {
@@ -89,6 +120,49 @@ const Sidebar: React.FC<SidebarProps> = ({ requests, isOpen, onToggle, currentUs
     return meters >= 1000 
       ? `${(meters / 1000).toFixed(1)} км`
       : `${meters} м`;
+  };
+
+  const handleRequestClick = (request: Request) => {
+    if (onRequestClick) {
+      onRequestClick(request);
+    }
+  };
+
+  const handleDeleteRequest = async (requestId: number) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Ошибка: токен не найден. Пожалуйста, войдите снова.');
+        window.location.href = '/login';
+        return;
+      }
+
+      const response = await axios.delete(
+        `http://localhost:8080/api/requests/${requestId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        }
+      );
+      
+      console.log('Response:', response.data);
+      if (onRequestDelete) {
+        onRequestDelete(requestId);
+      }
+      alert('Запрос успешно удален!');
+    } catch (error: any) {
+      console.error('Ошибка при удалении запроса:', error);
+      
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        alert('Сессия истекла. Пожалуйста, войдите снова.');
+        window.location.href = '/login';
+        return;
+      }
+      
+      alert('Ошибка при удалении запроса: ' + (error.response?.data || error.message));
+    }
   };
 
   return (
@@ -132,49 +206,74 @@ const Sidebar: React.FC<SidebarProps> = ({ requests, isOpen, onToggle, currentUs
         </div>
 
         <div className="filters">
-          <select 
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="filter-select"
-          >
-            {categories.map(cat => (
-              <option key={cat.value} value={cat.value}>
-                {cat.label}
-              </option>
-            ))}
-          </select>
+          <h4>Фильтры</h4>
+          
+          <div className="filter-section">
+            <div className="filter-section-title">Категория</div>
+            <select 
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="filter-select"
+            >
+              {categories.map(cat => (
+                cat.subcategories ? (
+                  <optgroup key={cat.value} label={cat.label}>
+                    {cat.subcategories.map(subcat => (
+                      <option key={subcat.value} value={subcat.value}>
+                        {subcat.label}
+                      </option>
+                    ))}
+                  </optgroup>
+                ) : (
+                  <option key={cat.value} value={cat.value}>
+                    {cat.label}
+                  </option>
+                )
+              ))}
+            </select>
+          </div>
 
-          <select 
-            value={selectedUrgency}
-            onChange={(e) => setSelectedUrgency(e.target.value)}
-            className="filter-select"
-          >
-            {urgencyOptions.map(opt => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+          <div className="filter-section">
+            <div className="filter-section-title">Срочность</div>
+            <select 
+              value={selectedUrgency}
+              onChange={(e) => setSelectedUrgency(e.target.value)}
+              className="filter-select"
+            >
+              {urgencyOptions.map(opt => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
 
-          <div className="distance-filter">
-            <label>Расстояние: {formatDistance(maxDistance)}</label>
-            <input
-              type="range"
-              min="100"
-              max="10000"
-              step="100"
-              value={maxDistance}
-              onChange={(e) => setMaxDistance(Number(e.target.value))}
-              className="distance-slider"
-            />
+          <div className="filter-section">
+            <div className="filter-section-title">Расстояние</div>
+            <div className="distance-filter">
+              <label>Максимальное расстояние: {formatDistance(maxDistance)}</label>
+              <input
+                type="range"
+                min="100"
+                max="10000"
+                step="100"
+                value={maxDistance}
+                onChange={(e) => setMaxDistance(Number(e.target.value))}
+                className="distance-slider"
+              />
+            </div>
           </div>
         </div>
 
         <div className="requests-list">
-          {activeTab === 'active' && (
+          {(activeTab === 'active' || activeTab === 'my') && (
             <div className="requests-grid">
               {filteredRequests.map((request) => (
-                <div key={request.id} className="request-card">
+                <div 
+                  key={request.id} 
+                  className={`request-card urgency-${request.urgency || 'low'}`}
+                  onClick={() => handleRequestClick(request)}
+                >
                   <div className="request-card-header">
                     <span className="request-category-tag">
                       {getCategoryLabel(request.category)}
@@ -191,11 +290,26 @@ const Sidebar: React.FC<SidebarProps> = ({ requests, isOpen, onToggle, currentUs
                   </div>
                   
                   <div className="request-card-footer">
-                    <span className="request-author">{request.userName}</span>
+                    <span className="request-author">
+                      {activeTab === 'my' ? 'Мой запрос' : `Автор: ${request.userName}`}
+                    </span>
                     {request.urgency && (
                       <span className={`request-urgency-tag ${request.urgency}`}>
                         {getUrgencyLabel(request.urgency)}
                       </span>
+                    )}
+                    {activeTab === 'my' && (
+                      <button 
+                        className="delete-request-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (window.confirm('Вы уверены, что хотите удалить этот запрос?')) {
+                            handleDeleteRequest(request.id);
+                          }
+                        }}
+                      >
+                        Удалить
+                      </button>
                     )}
                   </div>
                 </div>

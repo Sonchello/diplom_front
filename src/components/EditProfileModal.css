@@ -23,13 +23,13 @@
 }
 
 .edit-profile-modal {
-  background-color: #222629;
+  background-color: #FFFFFF;
   padding: 40px;
   border-radius: 15px;
   width: 95%;
   max-width: 800px;
   position: relative;
-  color: white;
+  color: #000000;
   box-shadow: 0 4px 20px rgba(0,0,0,0.3);
   max-height: 90vh;
   overflow-y: auto;
@@ -37,7 +37,7 @@
 }
 
 .edit-profile-modal h2 {
-  color: white;
+  color: #000000;
   font-size: 28px;
   margin-bottom: 30px;
   text-align: center;
@@ -50,13 +50,13 @@
   background: none;
   border: none;
   font-size: 24px;
-  color: white;
+  color: #000000;
   cursor: pointer;
   transition: color 0.3s;
 }
 
 .close-button:hover {
-  color: #86C232;
+  color: #333333;
 }
 
 .avatar-section {
@@ -72,11 +72,11 @@
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 20px;
-  border: 6px solid #86C232;
+  border: 6px solid #000000;
 }
 
 .upload-button {
-  background-color: #86C232;
+  background-color: #000000;
   color: white;
   padding: 12px 24px;
   border-radius: 8px;
@@ -89,7 +89,7 @@
 }
 
 .upload-button:hover {
-  background-color: #75a82b;
+  background-color: #333333;
   transform: translateY(-2px);
 }
 
@@ -101,23 +101,23 @@
   display: block;
   margin-bottom: 12px;
   font-weight: bold;
-  color: white;
+  color: #000000;
   font-size: 20px;
 }
 
 .form-group input {
   width: 100%;
   padding: 15px;
-  border: 2px solid #444;
+  border: 2px solid rgba(0, 0, 0, 0.2);
   border-radius: 8px;
   font-size: 18px;
-  background-color: #333;
-  color: white;
+  background-color: #FFFFFF;
+  color: #000000;
   transition: border-color 0.3s;
 }
 
 .form-group input:focus {
-  border-color: #86C232;
+  border-color: #000000;
   outline: none;
 }
 
@@ -130,7 +130,7 @@
 
 .save-button, .cancel-button {
   padding: 15px 35px;
-  border: none;
+  border: 2px solid #000000;
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
@@ -139,16 +139,24 @@
 }
 
 .save-button {
-  background-color: #86C232;
-  color: white;
+  background-color: #000000;
+  color: #FFFFFF;
 }
 
 .cancel-button {
-  background-color: #e74c3c;
-  color: white;
+  background-color: #FFFFFF;
+  color: #000000;
 }
 
-.save-button:hover, .cancel-button:hover {
+.save-button:hover {
+  background-color: #333333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.cancel-button:hover {
+  background-color: #000000;
+  color: #FFFFFF;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
@@ -157,9 +165,9 @@
   width: 100%;
   padding: 15px;
   margin: 15px 0;
-  background-color: #444;
-  color: white;
-  border: none;
+  background-color: #FFFFFF;
+  color: #000000;
+  border: 2px solid #000000;
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
@@ -168,7 +176,8 @@
 }
 
 .change-password-button:hover {
-  background-color: #555;
+  background-color: #000000;
+  color: #FFFFFF;
   transform: translateY(-2px);
 }
 
@@ -210,17 +219,17 @@
 }
 
 .edit-profile-modal::-webkit-scrollbar-track {
-  background: #333;
+  background: #FFFFFF;
   border-radius: 4px;
 }
 
 .edit-profile-modal::-webkit-scrollbar-thumb {
-  background: #86C232;
+  background: #000000;
   border-radius: 4px;
 }
 
 .edit-profile-modal::-webkit-scrollbar-thumb:hover {
-  background: #75a82b;
+  background: #333333;
 }
 
 /* Для случая, когда боковое меню закрыто */

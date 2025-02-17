@@ -11,7 +11,7 @@
     z-index: 1001;
     width: 50px; /* Увеличено с 40px */
     height: 50px; /* Увеличено с 40px */
-    background: #86C232; /* Основной цвет фона кнопки */
+    background: #000000; /* Основной цвет фона кнопки */
     border: none;
     border-radius: 50%;
     color: white; /* Цвет текста кнопки */
@@ -25,14 +25,14 @@
   }
   
   .menu-toggle-button:hover {
-    background: #75a82b; /* Цвет фона кнопки при наведении */
+    background: #333333; /* Цвет фона кнопки при наведении */
   }
   
   /* Стили для кнопки закрытия меню */
   .toggle-button {
     width: 50px; /* Увеличено с 40px */
     height: 50px; /* Увеличено с 40px */
-    background-color: #86C232; /* Основной цвет фона кнопки */
+    background-color: #000000; /* Основной цвет фона кнопки */
     border: none;
     border-radius: 50%;
     color: white; /* Цвет текста кнопки */
@@ -46,7 +46,7 @@
   }
   
   .toggle-button:hover {
-    background-color: #75a82b; /* Цвет фона кнопки при наведении */
+    background-color: #333333; /* Цвет фона кнопки при наведении */
   }
   
   /* Стили для кастомных кнопок zoom */
@@ -63,7 +63,7 @@
   .custom-zoom-control button {
     width: 50px; /* Увеличено с 40px */
     height: 50px; /* Увеличено с 40px */
-    background: #86C232; /* Цвет фона кнопок */
+    background: #000000; /* Цвет фона кнопок */
     border: none;
     border-radius: 50%;
     color: white; /* Цвет текста кнопок */
@@ -76,7 +76,7 @@
   }
   
   .custom-zoom-control button:hover {
-    background: #75a82b; /* Цвет фона кнопок при наведении */
+    background: #333333; /* Цвет фона кнопок при наведении */
   }
   
   /* Стили для кнопок в меню */
@@ -107,7 +107,7 @@
   .button_active {
     width: fit-content;
     margin: 0 3px 0 3px;
-    background: #86C232; /* Цвет активной кнопки */
+    background: #000000; /* Цвет активной кнопки */
     border: 0;
     border-radius: 999px;
     box-sizing: border-box;

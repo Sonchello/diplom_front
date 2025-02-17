@@ -1,10 +1,13 @@
 @import 'leaflet/dist/leaflet.css';
 @import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css');
+@import url('https://fonts.cdnfonts.com/css/gotem');
 
 html,
 body {
   margin: 0;
   background-color: #222629; /* Фон страницы */
+  font-family: 'brandon-grotesque', 'Avenir Next', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+  font-weight: 500;
 }
 
 ::-webkit-scrollbar {
@@ -26,37 +29,44 @@ body {
 }
 
 .leaflet-popup-content {
-  min-width: 400px;  /* делаем попап еще шире */
+  min-width: 400px;
   margin: 0;
   padding: 0;
-  background-color: white;
-  color: #333;
+  background: transparent;
+  color: #FFFFFF;
 }
 
 .leaflet-popup-content h3 {
   margin: 0 0 10px 0;
-  color: #222629;
+  color: #FFFFFF;
+  font-family: 'brandon-grotesque', 'Avenir Next', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .leaflet-popup-content p {
   margin: 5px 0;
-  color: #444;
+  color: #FFFFFF;
 }
 
 .leaflet-popup-content button {
   width: 100%;
   margin-top: 10px;
   padding: 8px 16px;
-  background-color: #86C232;
-  color: white;
-  border: none;
+  background: transparent;
+  color: #FFFFFF;
+  border: 2px solid #FFFFFF;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .leaflet-popup-content button:hover {
-  background-color: #75a82b;
+  background: #FFFFFF;
+  color: #000000;
 }
 
 .custom-marker {
@@ -69,20 +79,31 @@ body {
 }
 
 .custom-marker-icon {
-  width: 30px;
-  height: 30px;
-  border-radius: 50% 50% 50% 0;
-  background: #00cae9;
-  position: absolute;
-  transform: rotate(-45deg);
-  left: 50%;
-  top: 50%;
-  margin: -15px 0 0 -15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid #fff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  width: 128px !important;
+  height: 128px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  object-fit: contain !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  image-rendering: -webkit-optimize-contrast !important;
+  image-rendering: crisp-edges !important;
+  -ms-interpolation-mode: nearest-neighbor !important;
+  filter: none !important;
+  box-shadow: none !important;
+}
+
+.custom-marker-icon img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  image-rendering: -webkit-optimize-contrast !important;
+  image-rendering: crisp-edges !important;
+  -ms-interpolation-mode: nearest-neighbor !important;
+  filter: none !important;
+  box-shadow: none !important;
 }
 
 .marker-icon {
@@ -106,20 +127,22 @@ body {
 }
 
 .custom-marker-cluster {
-  background: white;
-  border: 4px solid #86C232;  /* увеличиваем толщину границы */
+  background: rgba(0, 0, 0, 0.9);
+  border: 2px solid #FFFFFF;
   border-radius: 50%;
-  color: #222629;
-  font-weight: bold;
-  font-size: 24px;           /* увеличиваем размер шрифта */
+  color: #FFFFFF;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);  /* усиливаем тень */
+  font-weight: bold;
+  font-size: 40px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 .custom-marker-cluster span {
-  line-height: 70px;  /* обновляем line-height в соответствии с новым размером */
+  line-height: 1;
 }
 
 .map {
@@ -127,379 +150,397 @@ body {
   z-index: 1;
 }
 
-/* Стили для кастомных кнопок zoom */
+/* Стили для кнопок управления */
 .custom-zoom-control {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 20px;
+  left: 20px;
   z-index: 1000;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  background: rgba(0, 0, 0, 0.95);
+  padding: 10px;
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .custom-zoom-control button {
-  width: 40px;
-  height: 40px;
-  background: #86C232; /* Цвет фона кнопок */
-  border: none;
+  width: 45px;
+  height: 45px;
+  background: transparent;
+  border: 2px solid #FFFFFF;
   border-radius: 50%;
-  color: white; /* Цвет текста кнопок */
-  font-size: 20px;
+  color: #FFFFFF;
+  font-size: 24px;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s ease;
 }
 
 .custom-zoom-control button:hover {
-  background: #75a82b; /* Цвет фона кнопок при наведении */
+  background: #FFFFFF;
+  color: #000000;
+  transform: scale(1.1);
 }
-/* Стили для кнопки выдвижения меню */
-.toggle-button {
-    width: 40px;
-    height: 40px;
-    background-color: #86C232; /* Новый цвет фона кнопки */
-    border: none;
-    border-radius: 50%;
-    color: white; /* Цвет текста кнопки */
-    font-size: 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.3s ease; /* Плавное изменение цвета при наведении */
-  }
-  
-  .toggle-button:hover {
-    background-color: #75a82b; /* Цвет фона кнопки при наведении */
-  }
 
+/* Стиль для кнопки создания запроса */
 .create-request-button {
   position: absolute;
   top: 20px;
   right: 20px;
   z-index: 1000;
-  padding: 15px 30px;  /* Увеличиваем padding */
-  background-color: #86C232;
-  color: white;
-  border: none;
-  border-radius: 8px;  /* Немного увеличиваем скругление */
+  padding: 15px 30px;
+  background: rgba(0, 0, 0, 0.95);
+  color: #FFFFFF;
+  border: 2px solid #FFFFFF;
+  border-radius: 30px;
+  font-size: 18px;
+  font-weight: 500;
   cursor: pointer;
-  font-size: 18px;    /* Увеличиваем размер шрифта */
-  font-weight: bold;   /* Делаем шрифт жирным */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* Усиливаем тень */
   transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .create-request-button:hover {
-  background-color: #75a82b;
-  transform: translateY(-2px);  /* Добавляем эффект при наведении */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  background: #FFFFFF;
+  color: #000000;
+  transform: translateY(-2px);
 }
 
-/* Добавляем эффект при нажатии */
-.create-request-button:active {
-  transform: translateY(1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-/* Добавим стили для контейнера карты */
-.leaflet-container {
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-}
-
-/* Стили для формы создания запроса */
+/* Стили для попапа формы */
 .request-form-popup {
-  min-width: 400px;  /* делаем форму шире */
-  padding: 25px;     /* увеличиваем отступы */
-  background-color: white;
-  border-radius: 8px;
+  background: #FFFFFF !important;
+  padding: 40px !important;
+  border-radius: 15px !important;
+  color: #000000 !important;
+  min-width: 600px !important;
+  border: 2px solid #000000 !important;
 }
 
 .request-form-popup h3 {
-  margin: 0 0 25px 0;
-  color: #222629;
-  text-align: center;
-  font-size: 24px;    /* увеличиваем размер заголовка */
-  font-weight: bold;
+  color: #000000 !important;
+  font-size: 32px !important;
+  margin-bottom: 30px !important;
+  text-align: center !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  border-bottom: 2px solid #000000 !important;
+  padding-bottom: 15px !important;
+  font-weight: 600 !important;
 }
 
-.request-form-popup .form-group {
-  margin-bottom: 25px;
+.form-group {
+  margin-bottom: 25px !important;
 }
 
-.request-form-popup label {
-  display: block;
-  margin-bottom: 12px;
-  color: #222629;
-  font-weight: bold;
-  font-size: 18px;    /* увеличиваем размер текста метки */
+.form-group label {
+  display: block !important;
+  margin-bottom: 12px !important;
+  color: #000000 !important;
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
 }
 
-.request-form-popup textarea {
-  width: 100%;
-  min-height: 150px;  /* увеличиваем высоту текстового поля */
-  padding: 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  resize: vertical;
-  font-size: 18px;    /* увеличиваем размер текста */
-  line-height: 1.5;
-  color: #333;
-  background-color: #f8f9fa;
+.form-group textarea {
+  width: 100% !important;
+  min-height: 150px !important;
+  padding: 15px !important;
+  background: #FFFFFF !important;
+  border: 2px solid #000000 !important;
+  border-radius: 8px !important;
+  color: #000000 !important;
+  font-size: 18px !important;
+  resize: vertical !important;
+  transition: all 0.3s ease !important;
 }
 
-.request-form-popup select {
-  width: 100%;
-  padding: 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 18px;    /* увеличиваем размер текста */
-  color: #333;
-  background-color: #f8f9fa;
+.form-group textarea:focus {
+  outline: none !important;
+  border-color: #000000 !important;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3) !important;
 }
 
-.request-form-popup select option {
-  font-size: 18px;    /* увеличиваем размер текста в опциях */
-  padding: 15px;
+.form-group select {
+  width: 100% !important;
+  padding: 15px !important;
+  background: #FFFFFF !important;
+  border: 2px solid #000000 !important;
+  border-radius: 8px !important;
+  color: #000000 !important;
+  font-size: 18px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
 }
 
+.form-group select:focus {
+  outline: none !important;
+  border-color: #000000 !important;
+}
+
+.form-group select option {
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  padding: 15px !important;
+  font-size: 18px !important;
+}
+
+/* Стили для кнопок срочности */
 .urgency-buttons {
-  display: flex;
-  gap: 8px;
-  margin-top: 5px;
+  display: flex !important;
+  gap: 15px !important;
+  margin: 15px 0 !important;
 }
 
 .urgency-button {
-  flex: 1;
-  padding: 12px;      /* увеличиваем padding */
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 16px;    /* увеличиваем размер текста */
-  transition: all 0.3s ease;
-  opacity: 0.7;
+  flex: 1 !important;
+  padding: 15px !important;
+  border: 2px solid #000000 !important;
+  border-radius: 8px !important;
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  font-size: 18px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  font-weight: 600 !important;
+}
+
+.urgency-button:hover {
+  background: rgba(0, 0, 0, 0.1) !important;
 }
 
 .urgency-button.active {
-  opacity: 1;
-  transform: scale(1.05);
+  background: #000000 !important;
+  color: #FFFFFF !important;
 }
 
-.urgency-button.low {
-  background-color: #28a745;
-  color: white;
-}
-
-.urgency-button.medium {
-  background-color: #ffc107;
-  color: #000;
-}
-
-.urgency-button.high {
-  background-color: #dc3545;
-  color: white;
-}
-
+/* Стили для кнопок формы */
 .form-buttons {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
+  display: flex !important;
+  gap: 15px !important;
+  margin-top: 30px !important;
 }
 
-.form-buttons button {
-  flex: 1;
-  padding: 15px;      /* увеличиваем padding */
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 18px;    /* увеличиваем размер текста */
-  transition: all 0.3s ease;
+.submit-button, .cancel-button {
+  flex: 1 !important;
+  padding: 15px !important;
+  border: 2px solid #000000 !important;
+  border-radius: 8px !important;
+  font-size: 18px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  font-weight: 600 !important;
 }
 
 .submit-button {
-  background-color: #86C232;
-  color: white;
+  background: #000000 !important;
+  color: #FFFFFF !important;
 }
 
 .submit-button:hover {
-  background-color: #75a82b;
+  background: #333333 !important;
 }
 
 .cancel-button {
-  background-color: #e74c3c;
-  color: white;
+  background: #FFFFFF !important;
+  color: #000000 !important;
 }
 
 .cancel-button:hover {
-  background-color: #c0392b;
+  background: rgba(0, 0, 0, 0.1) !important;
 }
 
+/* Стили для маркера местоположения пользователя */
+.user-location-marker {
+  width: 64px !important;
+  height: 64px !important;
+  background: rgba(255, 0, 0, 0.15);
+  border: 2px solid #FF0000;
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+  animation: pulse 2s infinite;
+}
+
+.user-marker-inner {
+  width: 32px;
+  height: 32px;
+  background: #FF0000;
+  border: 2px solid #FFFFFF;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.user-location-popup {
+  padding: 8px 16px;
+  background: rgba(255, 0, 0, 0.9);
+  color: #FFFFFF;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3);
+}
+
+/* Стили для попапа запроса */
 .request-popup {
-  min-width: 300px;
+  background: rgba(0, 0, 0, 0.95);
   padding: 20px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  border-radius: 12px;
+  color: #FFFFFF;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .request-popup h3 {
-  margin: 0 0 15px 0;
-  color: #222629;
-  border-bottom: 2px solid #86C232;
-  padding-bottom: 10px;
-  font-size: 22px;  /* увеличиваем заголовок */
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.request-popup p {
-  margin: 10px 0;
-  color: #333;
-  font-size: 16px;  /* увеличиваем текст описания */
-  line-height: 1.6;
+  color: #FFFFFF;
+  border-bottom: 2px solid #FFFFFF;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
 }
 
 .request-popup .category-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 10px 0;
-  font-weight: bold;
-  color: #444;
-  font-size: 18px;  /* увеличиваем текст категории */
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 15px 0;
 }
 
 .request-popup .description {
-  background-color: #f5f5f5;
-  padding: 10px;
-  border-radius: 4px;
-  margin: 10px 0;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 15px;
+  border-radius: 6px;
+  margin: 15px 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .request-popup .description strong {
+  color: #FFFFFF;
   display: block;
   margin-bottom: 8px;
-  color: #333;
-  font-size: 18px;  /* увеличиваем заголовок описания */
 }
 
 .request-popup .description p {
+  color: rgba(255, 255, 255, 0.9);
   margin: 0;
-  color: #444;
-  font-size: 16px;  /* увеличиваем текст описания */
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .request-popup .user-info {
-  font-style: italic;
-  color: #666;
-  margin: 10px 0;
-  font-size: 16px;  /* увеличиваем информацию о пользователе */
-}
-
-.request-popup .urgency {
-  display: inline-block;
-  padding: 5px 10px;
-  border-radius: 4px;
-  color: white;
-  font-weight: bold;
-  margin: 10px 0;
-  font-size: 16px;  /* увеличиваем текст срочности */
-}
-
-.request-popup .help-button {
-  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
   padding: 10px;
-  background-color: #86C232;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  margin-top: 15px;
-  transition: background-color 0.3s;
-}
-
-.request-popup .help-button:hover {
-  background-color: #75a82b;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  margin: 15px 0;
 }
 
 .request-popup .status {
   display: inline-block;
-  padding: 5px 10px;
-  border-radius: 4px;
+  padding: 8px 15px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+  margin: 15px 0;
+}
+
+.request-popup .urgency {
+  display: inline-block;
+  padding: 8px 15px;
+  border-radius: 6px;
+  color: #FFFFFF;
   font-weight: bold;
-  margin: 10px 0;
-  background-color: #f0f0f0;
-  color: #444;
-  font-size: 16px;  /* увеличиваем текст статуса */
+  margin: 15px 0;
+  width: 100%;
+  text-align: center;
 }
 
-.category-select {
-  display: flex;
-  align-items: center;
-  gap: 5px;
+.request-popup .urgency.low {
+  background: rgba(255, 255, 255, 0.2);
 }
 
-.category-icon {
-  font-size: 1.2em;
-  margin-right: 5px;
+.request-popup .urgency.medium {
+  background: rgba(255, 255, 255, 0.4);
 }
 
-.custom-pin {
-  background: none;
-  border: none;
+.request-popup .urgency.high {
+  background: rgba(255, 255, 255, 0.6);
 }
 
-.custom-pin span {
-  display: block;
+.request-popup .help-button {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  color: #FFFFFF;
+  border: 2px solid #FFFFFF;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 16px;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.legend-icon {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  margin-right: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  color: white;
+.request-popup .help-button:hover {
+  background: #FFFFFF;
+  color: #000000;
+  transform: translateY(-2px);
 }
 
-.legend-icon svg {
-  width: 14px;
-  height: 14px;
+.request-popup .help-button:active {
+  transform: translateY(0);
 }
 
-.legend-text {
-  font-size: 14px;
-  color: #333;
-}
-
-/* Стили для контейнера попапа Leaflet */
+/* Обновляем стили для контейнера попапа Leaflet */
 .leaflet-popup-content-wrapper {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 3px 14px rgba(0,0,0,0.3);
-  padding: 0;
+  background: rgba(0, 0, 0, 0.95);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.4);
 }
 
 .leaflet-popup-content {
-  min-width: 350px;  /* увеличиваем ширину */
-  margin: 0;
-  padding: 0;
-  background-color: white;
-  color: #333;
+  background: transparent;
+  color: #FFFFFF;
+}
+
+.leaflet-popup-tip {
+  background: #000000;
+  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Стили для контента попапа */
@@ -518,6 +559,8 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+  font-family: 'brandon-grotesque', 'Avenir Next', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+  font-weight: 500;
 }
 
 .request-popup .category-info {
@@ -611,6 +654,8 @@ body {
   font-size: 16px;
   margin-top: 20px;
   transition: all 0.3s ease;
+  font-family: 'brandon-grotesque', 'Avenir Next', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+  font-weight: 500;
 }
 
 .request-popup .help-button:hover {
@@ -624,65 +669,64 @@ body {
   box-shadow: none;
 }
 
-/* Стили для маркера местоположения пользователя */
-.user-location-marker {
-  width: 40px !important;
-  height: 40px !important;
-  background: none !important;
-  border: none !important;
-}
-
-.user-marker-inner {
-  width: 40px;
-  height: 40px;
-  background-color: #ff4444;  /* меняем на красный цвет */
-  border: 4px solid white;
-  border-radius: 50%;
-  box-shadow: 0 0 15px rgba(255, 68, 68, 0.8);  /* красное свечение */
-  position: relative;
-}
-
-.user-marker-inner::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: 3px solid #ff4444;  /* красная пульсация */
-  opacity: 0.6;
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.6;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1.5);
-    opacity: 0;
-  }
-}
-
-.user-location-popup {
-  padding: 12px 20px;
-  font-size: 18px;
-  font-weight: bold;
-  color: #ff4444;  /* красный текст */
-  text-align: center;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(255, 68, 68, 0.3);
-}
-
 /* Обновляем стили для маркера пользователя */
 .leaflet-marker-icon {
-  transition: all 0.3s ease;
+  background: none;
+  border: none;
+  transition: transform 0.3s ease;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 128px !important;
+  height: 128px !important;
+  image-rendering: -webkit-optimize-contrast !important;
+  image-rendering: crisp-edges !important;
+  -ms-interpolation-mode: nearest-neighbor !important;
+  filter: none !important;
+  box-shadow: none !important;
 }
 
 .leaflet-marker-icon:hover {
-  transform: scale(1.1);
+  transform: scale(1.2);
+  z-index: 1000 !important;
+}
+
+.request-status.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.request-status.completed {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.request-popup .delete-button {
+  width: 100%;
+  padding: 12px;
+  background: #dc3545;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 16px;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: 'brandon-grotesque', 'Avenir Next', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+}
+
+.request-popup .delete-button:hover {
+  background: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
+.request-popup .delete-button:active {
+  transform: translateY(0);
+  box-shadow: none;
 }

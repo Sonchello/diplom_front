@@ -1,14 +1,23 @@
 package com.example.platform.controller;
 
-import com.example.platform.model.Request;
-import com.example.platform.model.User;
-import com.example.platform.service.RequestService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.platform.model.Request;
+import com.example.platform.service.RequestService;
 
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @RestController
@@ -52,9 +61,37 @@ public class RequestController {
         return requestService.getActiveRequests();
     }
 
-    @PostMapping("/{requestId}/respond")
-    public ResponseEntity<?> respondToRequest(@RequestParam Long userId, @PathVariable Long requestId) {
+    @DeleteMapping("/{requestId}")
+    public ResponseEntity<?> deleteRequest(
+            @PathVariable Long requestId,
+            @RequestParam Long userId) {
         try {
+            requestService.deleteRequest(requestId, userId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{requestId}/status")
+    public ResponseEntity<?> updateRequestStatus(
+            @PathVariable Long requestId,
+            @RequestParam String status,
+            @RequestParam Long userId) {
+        try {
+            Request updatedRequest = requestService.updateRequestStatus(requestId, status, userId);
+            return ResponseEntity.ok(updatedRequest);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{requestId}/help")
+    public ResponseEntity<?> respondToRequest(
+            @PathVariable Long requestId,
+            @RequestBody Map<String, Object> payload) {
+        try {
+            Long userId = Long.parseLong(payload.get("userId").toString());
             requestService.respondToRequest(userId, requestId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -62,8 +99,40 @@ public class RequestController {
         }
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getUserRequests(@PathVariable Long userId) {
+        try {
+            List<Request> requests = requestService.getUserRequests(userId);
+            return ResponseEntity.ok(requests);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @GetMapping("/user/{userId}/helped")
-    public List<Request> getHelpedRequestsByUser(@PathVariable Long userId) {
-        return requestService.getHelpedRequestsByUser(userId);
+    public ResponseEntity<?> getHelpedRequestsByUser(@PathVariable Long userId) {
+        try {
+            List<Request> requests = requestService.getHelpedRequestsByUser(userId);
+            return ResponseEntity.ok(requests);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<?> filterRequests(
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String urgency,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Double maxDistance,
+            @RequestParam(required = false) Double userLat,
+            @RequestParam(required = false) Double userLon) {
+        try {
+            List<Request> requests = requestService.filterRequests(
+                    category, urgency, status, maxDistance, userLat, userLon);
+            return ResponseEntity.ok(requests);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

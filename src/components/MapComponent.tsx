@@ -19,7 +19,13 @@ import {
   faUser,
   faInfoCircle,
   faExclamationTriangle,
-  faCheck
+  faCheck,
+  faLeaf,
+  faHandsHelping,
+  faCity,
+  faWrench,
+  faComments,
+  faTrash
 } from '@fortawesome/free-solid-svg-icons';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 
@@ -33,26 +39,51 @@ L.Icon.Default.mergeOptions({
 
 // Обновляем функцию создания кастомной иконки
 const createCustomIcon = (category: string) => {
-  const defaultIcon = new L.Icon({
-    iconUrl: require('leaflet/dist/images/marker-icon.png'),
-    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-    shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-  });
-
   try {
+    let iconUrl: string;
+    // Значительно увеличиваем размер для всех иконок
+    const iconSize: L.PointTuple = [128, 128] as L.PointTuple;
+    const iconAnchor: L.PointTuple = [64, 128] as L.PointTuple;
+    const popupAnchor: L.PointTuple = [0, -128] as L.PointTuple;
+
+    switch (category) {
+      case 'planting':
+        iconUrl = '/images/markers/tree.png';
+        break;
+      case 'transport':
+        iconUrl = '/images/markers/marker-transport-bus.png';
+        break;
+      case 'repair':
+        iconUrl = '/images/markers/repair.png';
+        break;
+      case 'communication':
+        iconUrl = '/images/markers/talk.png';
+        break;
+      case 'new':
+        iconUrl = '/images/markers/new.png';
+        break;
+      case 'fundraising':
+        iconUrl = '/images/markers/marker-fundraising.png';
+        break;
+      case 'other':
+        iconUrl = '/images/markers/other.png';
+        break;
+      default:
+        iconUrl = `/images/markers/marker-${category}.png`;
+    }
+
+    console.log('Creating icon for category:', category, 'with URL:', iconUrl);
+
     return new L.Icon({
-      iconUrl: `/images/markers/marker-${category}.png`,
-      iconSize: [90, 90],
-      iconAnchor: [45, 90],
-      popupAnchor: [0, -90]
+      iconUrl: iconUrl,
+      iconSize: iconSize,
+      iconAnchor: iconAnchor,
+      popupAnchor: popupAnchor,
+      className: 'custom-marker-icon'
     });
   } catch (error) {
-    console.warn(`Failed to load custom icon for category ${category}, using default`);
-    return defaultIcon;
+    console.warn(`Ошибка загрузки иконки для категории ${category}, использую стандартную`, error);
+    return new L.Icon.Default();
   }
 };
 
@@ -61,53 +92,111 @@ const createClusterIcon = (cluster: any) => {
   return L.divIcon({
     html: `<div class="custom-marker-cluster"><span>${cluster.getChildCount()}</span></div>`,
     className: '',
-    iconSize: L.point(70, 70, true)
+    iconSize: L.point(90, 90, true) // Увеличиваем размер кластера
   });
 };
 
-// Создаем объект с категориями
+// Создаем иконку для медицинской категории
+const medicalMarkerIcon = new L.Icon({
+  iconUrl: '/path/to/marker_med.png', // Убедитесь, что этот путь правильный
+  iconSize: [35, 57],
+  iconAnchor: [17, 57],
+  popupAnchor: [1, -57],
+  shadowSize: [57, 57]
+});
+
+// Обновляем объект с категориями
 const categories = [
   {
-    value: 'cleaning',
-    label: 'Уборка',
+    value: 'ecological',
+    label: 'Экология',
     icon: faBroom,
-    markerIcon: createCustomIcon('cleaning'),
-    color: '#4CAF50'
+    subcategories: [
+      {
+        value: 'cleaning',
+        label: 'Уборка территории',
+        icon: faBroom,
+        markerIcon: createCustomIcon('cleaning'),
+        color: '#4CAF50'
+      },
+      {
+        value: 'planting',
+        label: 'Посадка деревьев',
+        icon: faLeaf,
+        markerIcon: createCustomIcon('planting'),
+        color: '#2E7D32'
+      }
+    ]
   },
   {
-    value: 'clothing',
-    label: 'Одежда',
-    icon: faTshirt,
-    markerIcon: createCustomIcon('clothing'),
-    color: '#9C27B0'
+    value: 'social',
+    label: 'Социальная помощь',
+    icon: faHandsHelping,
+    subcategories: [
+      {
+        value: 'clothing',
+        label: 'Одежда',
+        icon: faTshirt,
+        markerIcon: createCustomIcon('clothing'),
+        color: '#9C27B0'
+      },
+      {
+        value: 'food',
+        label: 'Еда',
+        icon: faUtensils,
+        markerIcon: createCustomIcon('food'),
+        color: '#FF9800'
+      },
+      {
+        value: 'communication',
+        label: 'Общение',
+        icon: faComments,
+        markerIcon: createCustomIcon('communication'),
+        color: '#03A9F4'
+      }
+    ]
   },
   {
-    value: 'food',
-    label: 'Еда',
-    icon: faUtensils,
-    markerIcon: createCustomIcon('food'),
-    color: '#FF9800'
+    value: 'infrastructure',
+    label: 'Инфраструктура',
+    icon: faCity,
+    subcategories: [
+      {
+        value: 'transport',
+        label: 'Транспорт',
+        icon: faCar,
+        markerIcon: createCustomIcon('transport'),
+        color: '#00BCD4'
+      },
+      {
+        value: 'fundraising',
+        label: 'Сбор средств',
+        icon: faHandHoldingDollar,
+        markerIcon: createCustomIcon('fundraising'),
+        color: '#2196F3'
+      },
+      {
+        value: 'repair',
+        label: 'Ремонт',
+        icon: faWrench,
+        markerIcon: createCustomIcon('repair'),
+        color: '#607D8B'
+      }
+    ]
   },
   {
-    value: 'fundraising',
-    label: 'Сбор средств',
-    icon: faHandHoldingDollar,
-    markerIcon: createCustomIcon('fundraising'),
-    color: '#2196F3'
-  },
-  {
-    value: 'medical',        // изменено с 'new' на 'medical'
-    label: 'Медицинская помощь',
-    icon: faMedkit,
-    markerIcon: createCustomIcon('medical'),
-    color: '#f44336'
-  },
-  {
-    value: 'transport',
-    label: 'Транспорт',
-    icon: faCar,
-    markerIcon: createCustomIcon('transport'),
-    color: '#00BCD4'
+    value: 'housekeeping',
+    label: 'Бытовая помощь',
+    icon: faBroom,
+    subcategories: [
+      {
+        value: 'cleaning',
+        label: 'Уборка помещений',
+        icon: faBroom,
+        markerIcon: createCustomIcon('cleaning'),
+        color: '#8BC34A'
+      }
+    ]
   },
   {
     value: 'other',
@@ -118,23 +207,25 @@ const categories = [
   }
 ];
 
-// Создаем стандартную красную метку
-const newMarkerIcon = new L.Icon({
-  iconUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
-  iconSize: [35, 57],
-  iconAnchor: [17, 57],
-  popupAnchor: [1, -57],
-  shadowSize: [57, 57]
+// Создаем стандартную метку для нового запроса
+const newMarkerIcon = createCustomIcon('new');
+
+// Измените иконку на красный цвет
+const redMarkerIcon = new L.Icon({
+  iconUrl: '/path/to/red-marker-icon.png',
+  iconSize: [96, 96] as L.PointTuple,
+  iconAnchor: [48, 96] as L.PointTuple,
+  popupAnchor: [0, -96] as L.PointTuple,
+  shadowSize: [96, 96] as L.PointTuple,
+  shadowAnchor: [30, 96] as L.PointTuple
 });
 
 // Создаем иконку для маркера пользователя
 const userLocationIcon = L.divIcon({
   className: 'user-location-marker',
   html: '<div class="user-marker-inner"></div>',
-  iconSize: [24, 24],
-  iconAnchor: [12, 12]
+  iconSize: [64, 64],
+  iconAnchor: [32, 32]
 });
 
 interface Request {
@@ -155,6 +246,8 @@ interface MapComponentProps {
   onRequestAdded: () => void;
   userId: number;
   userLocation: {latitude: number; longitude: number} | null;
+  selectedRequest: Request | null;
+  mapRef: React.RefObject<L.Map | null>;
 }
 
 // Компонент для обработки кликов на карте
@@ -165,13 +258,24 @@ const MapClickHandler: React.FC<{ onClick: (e: L.LeafletMouseEvent) => void }> =
   return null;
 };
 
-const MapComponent: React.FC<MapComponentProps> = ({ requests, onRequestAdded, userId, userLocation }) => {
-  const mapRef = React.useRef<L.Map | null>(null);
+const MapComponent: React.FC<MapComponentProps> = ({ 
+  requests, 
+  onRequestAdded, 
+  userId, 
+  userLocation,
+  selectedRequest,
+  mapRef
+}) => {
+  // Удаляем старую ссылку на карту, так как теперь она передается через пропсы
+  // const mapRef = React.useRef<L.Map | null>(null);
   const [selectedPosition, setSelectedPosition] = useState<[number, number] | null>(null);
   const [isSelectingLocation, setIsSelectingLocation] = useState(false);
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [urgency, setUrgency] = useState<'low' | 'medium' | 'high'>('low');
+  const [userMarker, setUserMarker] = useState<L.Marker | null>(null);
+  const [locationInitialized, setLocationInitialized] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   const handleZoomIn = () => {
     if (mapRef.current) {
@@ -311,49 +415,208 @@ const MapComponent: React.FC<MapComponentProps> = ({ requests, onRequestAdded, u
     }
   };
 
-  useEffect(() => {
-    if (navigator.geolocation) {
-      // Запрашиваем местоположение с высокой точностью
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          if (mapRef.current) {
-            // Создаем маркер пользователя
-            const userMarker = L.marker(
-              [latitude, longitude],
-              { 
-                icon: userLocationIcon,
-                zIndexOffset: 1000
-              }
-            )
-              .addTo(mapRef.current)
-              .bindPopup('<div class="user-location-popup">Вы здесь</div>');
+  const handleDeleteRequest = async (requestId: number) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Ошибка: токен не найден. Пожалуйста, войдите снова.');
+        window.location.href = '/login';
+        return;
+      }
 
-            // Центрируем карту на местоположении пользователя
-            mapRef.current.setView([latitude, longitude], 15);  // увеличиваем зум до 15
-
-            // Очищаем маркер при размонтировании
-            return () => {
-              if (mapRef.current) {
-                userMarker.remove();
-              }
-            };
-          }
-        },
-        (error) => {
-          console.error('Ошибка получения геолокации:', error);
-          alert('Не удалось определить ваше местоположение. Пожалуйста, разрешите доступ к геолокации в настройках браузера.');
-        },
+      const response = await axios.delete(
+        `http://localhost:8080/api/requests/${requestId}`,
         {
-          enableHighAccuracy: true,  // Включаем высокую точность
-          timeout: 5000,             // Таймаут в 5 секунд
-          maximumAge: 0              // Всегда получаем свежие данные
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
         }
       );
-    } else {
-      alert('Ваш браузер не поддерживает геолокацию');
+      
+      console.log('Response:', response.data);
+      onRequestAdded();
+      alert('Запрос успешно удален!');
+    } catch (error: any) {
+      console.error('Ошибка при удалении запроса:', error);
+      
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        alert('Сессия истекла. Пожалуйста, войдите снова.');
+        window.location.href = '/login';
+        return;
+      }
+      
+      alert('Ошибка при удалении запроса: ' + (error.response?.data || error.message));
     }
-  }, [mapRef.current]); // Перезапускаем эффект только при изменении mapRef.current
+  };
+
+  // Функция для определения местоположения
+  const getCurrentPosition = () => {
+    return new Promise<GeolocationPosition>((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error('Геолокация не поддерживается вашим браузером'));
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => resolve(position),
+        (error) => reject(error),
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    });
+  };
+
+  useEffect(() => {
+    let watchId: number;
+
+    const initializeLocation = async () => {
+      try {
+        // Сначала пробуем получить точное местоположение
+        const position = await getCurrentPosition();
+        const { latitude, longitude, accuracy } = position.coords;
+
+        if (accuracy > 10000) {
+          console.warn('Низкая точность определения местоположения:', accuracy, 'метров');
+          setLocationError('Точность определения местоположения слишком низкая. Проверьте настройки геолокации.');
+          return;
+        }
+
+        console.log('Получены начальные координаты:', { latitude, longitude, accuracy: accuracy + ' метров' });
+
+        if (mapRef.current) {
+          // Удаляем предыдущий маркер
+          if (userMarker) {
+            userMarker.remove();
+          }
+
+          // Создаем новый маркер
+          const newMarker = L.marker(
+            [latitude, longitude],
+            { 
+              icon: userLocationIcon,
+              zIndexOffset: 1000
+            }
+          )
+            .addTo(mapRef.current)
+            .bindPopup('<div class="user-location-popup">Вы здесь</div>');
+
+          setUserMarker(newMarker);
+          setLocationError(null);
+
+          // Центрируем карту только при первой инициализации
+          if (!locationInitialized) {
+            mapRef.current.setView([latitude, longitude], 15);
+            setLocationInitialized(true);
+          }
+        }
+
+        // Начинаем отслеживание местоположения
+        watchId = navigator.geolocation.watchPosition(
+          (watchPosition) => {
+            const { latitude: newLat, longitude: newLng, accuracy: newAccuracy } = watchPosition.coords;
+            
+            if (newAccuracy > 10000) {
+              console.warn('Низкая точность при обновлении местоположения:', newAccuracy, 'метров');
+              return;
+            }
+
+            if (mapRef.current && userMarker) {
+              const newLatLng = new L.LatLng(newLat, newLng);
+              userMarker.setLatLng(newLatLng);
+            }
+          },
+          (error) => {
+            console.error('Ошибка отслеживания местоположения:', error);
+            let errorMessage = 'Ошибка определения местоположения: ';
+            
+            switch(error.code) {
+              case error.PERMISSION_DENIED:
+                errorMessage += 'доступ запрещен. Разрешите доступ к геолокации в настройках браузера.';
+                break;
+              case error.POSITION_UNAVAILABLE:
+                errorMessage += 'информация о местоположении недоступна. Проверьте подключение к интернету и GPS.';
+                break;
+              case error.TIMEOUT:
+                errorMessage += 'превышено время ожидания. Попробуйте еще раз.';
+                break;
+              default:
+                errorMessage += 'неизвестная ошибка. Попробуйте обновить страницу.';
+            }
+            
+            setLocationError(errorMessage);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          }
+        );
+      } catch (error: any) {
+        console.error('Ошибка инициализации местоположения:', error);
+        let errorMessage = 'Не удалось определить местоположение. ';
+        
+        if (error instanceof GeolocationPositionError) {
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage += 'Вы запретили доступ к геолокации. Пожалуйста, разрешите доступ в настройках браузера.';
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage += 'Информация о местоположении недоступна. Проверьте подключение к интернету и GPS.';
+              break;
+            case error.TIMEOUT:
+              errorMessage += 'Превышено время ожидания определения местоположения. Попробуйте еще раз.';
+              break;
+            default:
+              errorMessage += 'Произошла неизвестная ошибка. Попробуйте обновить страницу.';
+          }
+        } else {
+          errorMessage += error.message || 'Неизвестная ошибка';
+        }
+        
+        setLocationError(errorMessage);
+      }
+    };
+
+    initializeLocation();
+
+    // Очистка при размонтировании
+    return () => {
+      if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+      if (userMarker && mapRef.current) {
+        userMarker.remove();
+      }
+    };
+  }, []);
+
+  // Показываем ошибку, если она есть
+  useEffect(() => {
+    if (locationError) {
+      alert(locationError);
+    }
+  }, [locationError]);
+
+  // Добавляем эффект для отслеживания выбранного запроса
+  useEffect(() => {
+    if (selectedRequest && mapRef.current) {
+      // Находим маркер выбранного запроса
+      const markers = document.querySelectorAll('.leaflet-marker-icon');
+      markers.forEach((marker) => {
+        const markerLatLng = (marker as any)._latlng;
+        if (markerLatLng && 
+            markerLatLng.lat === selectedRequest.latitude && 
+            markerLatLng.lng === selectedRequest.longitude) {
+          // Симулируем клик по маркеру
+          marker.dispatchEvent(new Event('click'));
+        }
+      });
+    }
+  }, [selectedRequest]);
 
   return (
     <div style={{ position: 'relative', height: '100%', width: '100%', flex: 1 }}>
@@ -395,68 +658,103 @@ const MapComponent: React.FC<MapComponentProps> = ({ requests, onRequestAdded, u
             chunkedLoading
             iconCreateFunction={createClusterIcon}
           >
-            {requests.map((request) => (
-              <Marker
-                key={request.id}
-                position={[request.latitude, request.longitude]}
-                icon={categories.find(cat => cat.value === request.category)?.markerIcon}
-              >
-                <Popup>
-                  <div className="request-popup">
-                    <h3>
-                      <FontAwesomeIcon icon={categories.find(cat => cat.value === request.category)?.icon || faQuestion} />
-                      {categories.find(cat => cat.value === request.category)?.label || 'Неизвестная категория'}
-                    </h3>
-                    
-                    <div className="category-info">
-                      <FontAwesomeIcon icon={faTag} />
-                      Категория: {categories.find(cat => cat.value === request.category)?.label}
-                    </div>
-                    
-                    <div className="description">
-                      <strong>Описание:</strong>
-                      <p>{request.description}</p>
-                    </div>
-                    
-                    <div className="user-info">
-                      <FontAwesomeIcon icon={faUser} /> Автор: {request.userName}
-                    </div>
-                    
-                    <div className="status">
-                      <FontAwesomeIcon icon={faInfoCircle} /> Статус: {
-                        request.status === 'ACTIVE' ? 'Активный' :
-                        request.status === 'COMPLETED' ? 'Выполнен' : 
-                        request.status
-                      }
-                    </div>
-                    
-                    {request.urgency && (
-                      <div className={`urgency ${request.urgency}`}>
-                        <FontAwesomeIcon icon={faExclamationTriangle} /> Срочность: {
-                          request.urgency === 'low' ? 'Низкая' :
-                          request.urgency === 'medium' ? 'Средняя' : 'Высокая'
+            {requests.map((request) => {
+              let markerIcon;
+              const mainCategory = categories.find(cat => 
+                cat.subcategories?.some(sub => sub.value === request.category) || cat.value === request.category
+              );
+              
+              console.log('Request category:', request.category);
+              console.log('Found main category:', mainCategory);
+              
+              if (mainCategory && mainCategory.subcategories) {
+                const subCategory = mainCategory.subcategories.find(sub => sub.value === request.category);
+                console.log('Found subcategory:', subCategory);
+                if (request.category === 'fundraising') {
+                  markerIcon = createCustomIcon('fundraising');
+                } else {
+                  markerIcon = subCategory?.markerIcon || newMarkerIcon;
+                }
+              } else if (mainCategory) {
+                markerIcon = mainCategory.markerIcon || newMarkerIcon;
+              } else {
+                markerIcon = newMarkerIcon;
+              }
+
+              console.log('Using marker icon:', markerIcon);
+
+              return (
+                <Marker
+                  key={request.id}
+                  position={[request.latitude, request.longitude]}
+                  icon={markerIcon}
+                >
+                  <Popup>
+                    <div className="request-popup">
+                      <h3>
+                        <FontAwesomeIcon icon={mainCategory?.icon || faQuestion} />
+                        {mainCategory?.label || 'Неизвестная категория'}
+                      </h3>
+                      
+                      <div className="category-info">
+                        <FontAwesomeIcon icon={faTag} />
+                        Категория: {mainCategory?.label}
+                      </div>
+                      
+                      <div className="description">
+                        <strong>Описание:</strong>
+                        <p>{request.description}</p>
+                      </div>
+                      
+                      <div className="user-info">
+                        <FontAwesomeIcon icon={faUser} /> Автор: {request.userName}
+                      </div>
+                      
+                      <div className="status">
+                        <FontAwesomeIcon icon={faInfoCircle} /> Статус: {
+                          request.status === 'ACTIVE' ? 'Активный' :
+                          request.status === 'COMPLETED' ? 'Выполнен' : 
+                          request.status
                         }
                       </div>
-                    )}
-                    
-                    {request.status === 'ACTIVE' && (
-                      <button 
-                        className="help-button"
-                        onClick={() => handleHelpProvided(request.id)}
-                      >
-                        <FontAwesomeIcon icon={faCheck} /> Помощь оказана
-                      </button>
-                    )}
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
+                      
+                      {request.urgency && (
+                        <div className={`urgency ${request.urgency}`}>
+                          <FontAwesomeIcon icon={faExclamationTriangle} /> Срочность: {
+                            request.urgency === 'low' ? 'Низкая' :
+                            request.urgency === 'medium' ? 'Средняя' : 'Высокая'
+                          }
+                        </div>
+                      )}
+                      
+                      {request.status === 'ACTIVE' && (
+                        request.userId === userId ? (
+                          <button 
+                            className="delete-button"
+                            onClick={() => handleDeleteRequest(request.id)}
+                          >
+                            <FontAwesomeIcon icon={faTrash} /> Удалить запрос
+                          </button>
+                        ) : (
+                          <button 
+                            className="help-button"
+                            onClick={() => handleHelpProvided(request.id)}
+                          >
+                            <FontAwesomeIcon icon={faCheck} /> Помощь оказана
+                          </button>
+                        )
+                      )}
+                    </div>
+                  </Popup>
+                </Marker>
+              );
+            })}
           </MarkerClusterGroup>
 
           {isSelectingLocation && selectedPosition && (
             <Marker
               position={selectedPosition}
-              icon={category ? categories.find(cat => cat.value === category)?.markerIcon : newMarkerIcon}
+              icon={newMarkerIcon}
               draggable={true}
               eventHandlers={{
                 dragend: (e) => {
@@ -495,9 +793,19 @@ const MapComponent: React.FC<MapComponentProps> = ({ requests, onRequestAdded, u
                     >
                       <option value="">Выберите категорию</option>
                       {categories.map(cat => (
-                        <option key={cat.value} value={cat.value}>
-                          <FontAwesomeIcon icon={cat.icon} /> {cat.label}
-                        </option>
+                        cat.subcategories ? (
+                          <optgroup key={cat.value} label={cat.label}>
+                            {cat.subcategories.map(subcat => (
+                              <option key={subcat.value} value={subcat.value}>
+                                {subcat.label}
+                              </option>
+                            ))}
+                          </optgroup>
+                        ) : (
+                          <option key={cat.value} value={cat.value}>
+                            {cat.label}
+                          </option>
+                        )
                       ))}
                     </select>
                   </div>
@@ -545,23 +853,6 @@ const MapComponent: React.FC<MapComponentProps> = ({ requests, onRequestAdded, u
               </Popup>
             </Marker>
           )}
-
-          <div className="category-legend">
-            <h4>Категории запросов:</h4>
-            {categories.map(cat => (
-              <div key={cat.value} className="legend-item">
-                <div 
-                  className="legend-icon" 
-                  style={{ backgroundColor: cat.color }}
-                >
-                  <FontAwesomeIcon icon={cat.icon} />
-                </div>
-                <span className="legend-text">
-                  {cat.label}
-                </span>
-              </div>
-            ))}
-          </div>
         </MapContainer>
       </div>
     </div>
