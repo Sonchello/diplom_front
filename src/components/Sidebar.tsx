@@ -17,6 +17,14 @@ interface Request {
   urgency?: 'low' | 'medium' | 'high';
   userId: number;
   createdAt: string;
+  activeHelper?: { id: number };
+  helpHistory?: { 
+    id: number;
+    helper: { id: number };
+    status: string;
+    startDate: string;
+    endDate?: string;
+  }[];
 }
 
 interface User {
@@ -78,19 +86,39 @@ const Sidebar: React.FC<SidebarProps> = ({ requests, isOpen, onToggle, currentUs
   ];
 
   const urgencyOptions = [
-    { value: 'all', label: 'Любая срочность' },
+    { value: 'all', label: 'Любая' },
     { value: 'low', label: 'Низкая' },
     { value: 'medium', label: 'Средняя' },
     { value: 'high', label: 'Высокая' }
   ];
 
   const filteredRequests = requests.filter(request => {
-    const categoryMatch = selectedCategory === 'all' || request.category === selectedCategory;
-    const distanceMatch = !request.distance || (request.distance * 1000) <= maxDistance;
-    const urgencyMatch = selectedUrgency === 'all' || request.urgency === selectedUrgency;
-    const userMatch = activeTab === 'my' ? request.userId === currentUser?.id : true;
-    return categoryMatch && distanceMatch && urgencyMatch && userMatch;
+    if (activeTab === 'my') {
+      return request.userId === currentUser?.id;
+    }
+    if (activeTab === 'responses') {
+      return request.status === 'IN_PROGRESS' && 
+             ((request.activeHelper?.id === currentUser?.id) || 
+              (request.helpHistory?.some(help => 
+                help.helper.id === currentUser?.id && help.status === 'IN_PROGRESS'
+              )));
+    }
+    if (activeTab === 'helped') {
+      return request.activeHelper?.id === currentUser?.id && request.status === 'COMPLETED';
+    }
+    if (activeTab === 'active') {
+      const categoryMatch = selectedCategory === 'all' || request.category === selectedCategory;
+      const distanceMatch = !request.distance || (request.distance * 1000) <= maxDistance;
+      const urgencyMatch = selectedUrgency === 'all' || request.urgency === selectedUrgency;
+      return request.status === 'ACTIVE' && categoryMatch && distanceMatch && urgencyMatch;
+    }
+    return false;
   });
+
+  console.log('Active tab:', activeTab);
+  console.log('All requests:', requests);
+  console.log('Current user:', currentUser);
+  console.log('Filtered requests:', filteredRequests);
 
   const getCategoryLabel = (category: string): string => {
     const categoryMap: { [key: string]: string } = {
@@ -131,19 +159,19 @@ const Sidebar: React.FC<SidebarProps> = ({ requests, isOpen, onToggle, currentUs
   const handleDeleteRequest = async (requestId: number) => {
     try {
       const token = localStorage.getItem('token');
-      if (!token) {
-        alert('Ошибка: токен не найден. Пожалуйста, войдите снова.');
+      if (!token || !currentUser) {
+        alert('Ошибка: токен не найден или пользователь не авторизован. Пожалуйста, войдите снова.');
         window.location.href = '/login';
         return;
       }
 
       const response = await axios.delete(
-        `http://localhost:8080/api/requests/${requestId}`,
+        `http://localhost:8080/api/requests/${requestId}?userId=${currentUser.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'
-          },
+          }
         }
       );
       
@@ -161,14 +189,15 @@ const Sidebar: React.FC<SidebarProps> = ({ requests, isOpen, onToggle, currentUs
         return;
       }
       
-      alert('Ошибка при удалении запроса: ' + (error.response?.data || error.message));
+      const errorMessage = error.response?.data?.message || 'Неизвестная ошибка при удалении запроса';
+      alert(errorMessage);
     }
   };
 
   return (
     <div className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
       <button onClick={onToggle} className="toggle-button">✕</button>
-
+      
       <div className="content">
         {currentUser && (
           <div className="heading">
@@ -198,6 +227,12 @@ const Sidebar: React.FC<SidebarProps> = ({ requests, isOpen, onToggle, currentUs
             Мои запросы
           </button>
           <button 
+            className={`menu-tab ${activeTab === 'responses' ? 'active' : ''}`}
+            onClick={() => setActiveTab('responses')}
+          >
+            Отклики
+          </button>
+          <button 
             className={`menu-tab ${activeTab === 'helped' ? 'active' : ''}`}
             onClick={() => setActiveTab('helped')}
           >
@@ -207,136 +242,107 @@ const Sidebar: React.FC<SidebarProps> = ({ requests, isOpen, onToggle, currentUs
 
         <div className="filters">
           <h4>Фильтры</h4>
-          
-          <div className="filter-section">
-            <div className="filter-section-title">Категория</div>
-            <select 
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="filter-select"
-            >
-              {categories.map(cat => (
-                cat.subcategories ? (
-                  <optgroup key={cat.value} label={cat.label}>
-                    {cat.subcategories.map(subcat => (
-                      <option key={subcat.value} value={subcat.value}>
-                        {subcat.label}
-                      </option>
-                    ))}
-                  </optgroup>
-                ) : (
-                  <option key={cat.value} value={cat.value}>
-                    {cat.label}
-                  </option>
-                )
-              ))}
-            </select>
-          </div>
+          <select 
+            className="filter-select"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            {categories.map(category => (
+              <option key={category.value} value={category.value}>
+                {category.label}
+              </option>
+            ))}
+          </select>
 
-          <div className="filter-section">
+          <div className="urgency-filter">
             <div className="filter-section-title">Срочность</div>
-            <select 
-              value={selectedUrgency}
-              onChange={(e) => setSelectedUrgency(e.target.value)}
-              className="filter-select"
-            >
-              {urgencyOptions.map(opt => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
+            <div className="urgency-filter-buttons">
+              {urgencyOptions.map(option => (
+                <button
+                  key={option.value}
+                  className={`urgency-filter-button ${selectedUrgency === option.value ? 'active' : ''}`}
+                  onClick={() => setSelectedUrgency(option.value)}
+                >
+                  {option.label}
+                </button>
               ))}
-            </select>
+            </div>
           </div>
 
-          <div className="filter-section">
-            <div className="filter-section-title">Расстояние</div>
-            <div className="distance-filter">
-              <label>Максимальное расстояние: {formatDistance(maxDistance)}</label>
-              <input
-                type="range"
-                min="100"
-                max="10000"
-                step="100"
-                value={maxDistance}
-                onChange={(e) => setMaxDistance(Number(e.target.value))}
-                className="distance-slider"
-              />
-            </div>
+          <div className="distance-filter">
+            <label>
+              Максимальное расстояние: {maxDistance / 1000} км
+            </label>
+            <input
+              type="range"
+              min="1000"
+              max="50000"
+              step="1000"
+              value={maxDistance}
+              onChange={(e) => setMaxDistance(Number(e.target.value))}
+              className="distance-slider"
+            />
           </div>
         </div>
 
         <div className="requests-list">
-          {(activeTab === 'active' || activeTab === 'my') && (
-            <div className="requests-grid">
-              {filteredRequests.map((request) => (
-                <div 
-                  key={request.id} 
-                  className={`request-card urgency-${request.urgency || 'low'}`}
-                  onClick={() => handleRequestClick(request)}
-                >
-                  <div className="request-card-header">
-                    <span className="request-category-tag">
-                      {getCategoryLabel(request.category)}
-                    </span>
-                    {request.distance && (
-                      <span className="request-distance">
-                        {formatDistance(request.distance * 1000)}
-                      </span>
-                    )}
-                  </div>
-                  
-                  <div className="request-card-content">
-                    <p className="request-description">{request.description}</p>
-                  </div>
-                  
-                  <div className="request-card-footer">
-                    <span className="request-author">
-                      {activeTab === 'my' ? 'Мой запрос' : `Автор: ${request.userName}`}
-                    </span>
-                    {request.urgency && (
-                      <span className={`request-urgency-tag ${request.urgency}`}>
-                        {getUrgencyLabel(request.urgency)}
-                      </span>
-                    )}
-                    {activeTab === 'my' && (
-                      <button 
-                        className="delete-request-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (window.confirm('Вы уверены, что хотите удалить этот запрос?')) {
-                            handleDeleteRequest(request.id);
-                          }
-                        }}
-                      >
-                        Удалить
-                      </button>
-                    )}
-                  </div>
+          <div className="requests-grid">
+            {filteredRequests.map(request => (
+              <div
+                key={request.id}
+                className={`request-card urgency-${request.urgency || 'low'}`}
+                onClick={() => handleRequestClick(request)}
+              >
+                <div className="request-card-header">
+                  <span className="request-category-tag">
+                    {getCategoryLabel(request.category)}
+                  </span>
+                  <span className={`request-status ${request.status.toLowerCase()}`}>
+                    {getStatusLabel(request.status)}
+                  </span>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
 
-        {isEditProfileOpen && currentUser && (
-          <EditProfileModal
-            user={{
-              id: currentUser.id,
-              name: currentUser.name,
-              email: currentUser.email,
-              avatarUrl: currentUser.avatarUrl || '',
-              birthDate: currentUser.birthDate
-            }}
-            onClose={() => setIsEditProfileOpen(false)}
-            onUpdate={() => {
-              if (onUserUpdate) {
-                onUserUpdate();
-              }
-              setIsEditProfileOpen(false);
-            }}
-          />
-        )}
+                <div className="request-card-content">
+                  <p className="request-description">{request.description}</p>
+                </div>
+
+                <div className="request-card-footer">
+                  <span className="request-author">
+                    {request.userName}
+                  </span>
+                  {request.distance && (
+                    <span className="request-distance">
+                      {formatDistance(request.distance)}
+                    </span>
+                  )}
+                  {request.userId === currentUser?.id && (
+                    <button
+                      className="delete-request-button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteRequest(request.id);
+                      }}
+                    >
+                      Удалить
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
+
+      {isEditProfileOpen && currentUser && (
+        <EditProfileModal
+          user={{
+            ...currentUser,
+            avatarUrl: currentUser.avatarUrl || DEFAULT_AVATAR_URL
+          }}
+          onClose={() => setIsEditProfileOpen(false)}
+          onUpdate={onUserUpdate || (() => {})}
+        />
+      )}
     </div>
   );
 };

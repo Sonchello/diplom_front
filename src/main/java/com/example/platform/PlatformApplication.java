@@ -13,7 +13,7 @@ public class PlatformApplication {
 
 	@Value("${file.upload-dir}")
 	private String uploadDir;
-	
+
 	@PostConstruct
 	public void init() {
 		try {

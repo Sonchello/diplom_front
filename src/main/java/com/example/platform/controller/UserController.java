@@ -62,31 +62,31 @@ public class UserController {
             if (user == null) {
                 return ResponseEntity.notFound().build();
             }
-            
+
             if (name != null && !name.isEmpty()) {
                 user.setName(name);
             }
-            
+
             if (birthDate != null && !birthDate.isEmpty()) {
                 user.setBirthDate(LocalDate.parse(birthDate));
             }
-            
+
             if (avatar != null && !avatar.isEmpty()) {
-                String fileName = UUID.randomUUID().toString() + 
-                    getFileExtension(avatar.getOriginalFilename());
+                String fileName = UUID.randomUUID().toString() +
+                        getFileExtension(avatar.getOriginalFilename());
                 Path filePath = Paths.get(uploadDir, fileName);
                 Files.copy(avatar.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
                 user.setAvatarUrl("/uploads/" + fileName);
             }
-            
+
             User updatedUser = userService.updateUser(user);
             return ResponseEntity.ok(updatedUser);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Ошибка при обновлении пользователя: " + e.getMessage());
+                    .body("Ошибка при обновлении пользователя: " + e.getMessage());
         }
     }
-    
+
     private String getFileExtension(String fileName) {
         if (fileName == null) return "";
         int lastIndexOf = fileName.lastIndexOf(".");

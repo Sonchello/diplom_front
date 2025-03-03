@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -66,10 +67,39 @@ public class RequestController {
             @PathVariable Long requestId,
             @RequestParam Long userId) {
         try {
+            // Проверяем, существует ли запрос
+            Request request = requestService.getRequestById(requestId);
+            if (request == null) {
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body(Map.of(
+                                "success", false,
+                                "message", "Request not found with id: " + requestId
+                        ));
+            }
+
+            // Проверяем, является ли пользователь создателем запроса
+            if (request.getUser() == null || !request.getUser().getId().equals(userId)) {
+                return ResponseEntity
+                        .status(HttpStatus.FORBIDDEN)
+                        .body(Map.of(
+                                "success", false,
+                                "message", "You can only delete your own requests"
+                        ));
+            }
+
             requestService.deleteRequest(requestId, userId);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Request deleted successfully"
+            ));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                            "success", false,
+                            "message", "Error deleting request: " + e.getMessage()
+                    ));
         }
     }
 
@@ -89,9 +119,8 @@ public class RequestController {
     @PostMapping("/{requestId}/help")
     public ResponseEntity<?> respondToRequest(
             @PathVariable Long requestId,
-            @RequestBody Map<String, Object> payload) {
+            @RequestParam Long userId) {
         try {
-            Long userId = Long.parseLong(payload.get("userId").toString());
             requestService.respondToRequest(userId, requestId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -131,6 +160,62 @@ public class RequestController {
             List<Request> requests = requestService.filterRequests(
                     category, urgency, status, maxDistance, userLat, userLon);
             return ResponseEntity.ok(requests);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/user/{userId}/active-helps")
+    public ResponseEntity<?> getActiveHelpRequests(@PathVariable Long userId) {
+        try {
+            List<Request> requests = requestService.getActiveHelpRequests(userId);
+            return ResponseEntity.ok(requests);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/user/{userId}/completed-helps")
+    public ResponseEntity<?> getCompletedHelpRequests(@PathVariable Long userId) {
+        try {
+            List<Request> requests = requestService.getCompletedHelpRequests(userId);
+            return ResponseEntity.ok(requests);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{requestId}/complete-help")
+    public ResponseEntity<?> completeHelp(
+            @PathVariable Long requestId,
+            @RequestParam Long helperId) {
+        try {
+            Request updatedRequest = requestService.completeHelp(requestId, helperId);
+            return ResponseEntity.ok(updatedRequest);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{requestId}/cancel-help")
+    public ResponseEntity<?> cancelHelp(
+            @PathVariable Long requestId,
+            @RequestParam Long helperId) {
+        try {
+            Request updatedRequest = requestService.cancelHelp(requestId, helperId);
+            return ResponseEntity.ok(updatedRequest);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{requestId}/confirm-help")
+    public ResponseEntity<?> confirmHelpCompletion(
+            @PathVariable Long requestId,
+            @RequestParam Long userId) {
+        try {
+            Request request = requestService.confirmHelpCompletion(requestId, userId);
+            return ResponseEntity.ok(request);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

@@ -25,9 +25,11 @@ import {
   faCity,
   faWrench,
   faComments,
-  faTrash
+  faTrash,
+  faBell
 } from '@fortawesome/free-solid-svg-icons';
 import MarkerClusterGroup from 'react-leaflet-cluster';
+import NotificationsPanel from './NotificationsPanel';
 
 // Фикс для иконок Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -239,7 +241,57 @@ interface Request {
   userName: string;
   userId: number;
   createdAt: string;
+  activeHelper?: { 
+    id: number;
+    name?: string;
+  };
+  helpHistory?: {
+    id: number;
+    helper: {
+      id: number;
+      name?: string;
+    };
+    status: string;
+  }[];
 }
+
+const getCategoryLabel = (category: string): string => {
+    const categoryMap: { [key: string]: string } = {
+        'ecological': 'Экология',
+        'cleaning': 'Уборка территории',
+        'planting': 'Посадка деревьев',
+        'social': 'Социальная помощь',
+        'clothing': 'Одежда',
+        'food': 'Еда',
+        'communication': 'Общение',
+        'infrastructure': 'Инфраструктура',
+        'transport': 'Транспорт',
+        'fundraising': 'Сбор средств',
+        'repair': 'Ремонт',
+        'housekeeping': 'Бытовая помощь',
+        'other': 'Другое'
+    };
+    return categoryMap[category] || 'Неизвестная категория';
+};
+
+const getStatusLabel = (status: string): string => {
+    const statuses: { [key: string]: string } = {
+        'ACTIVE': 'Активный',
+        'IN_PROGRESS': 'В процессе',
+        'COMPLETED': 'Выполнен',
+        'CANCELLED': 'Отменён'
+    };
+    return statuses[status] || status;
+};
+
+const getUrgencyLabel = (urgency: string): string => {
+    const urgencies: { [key: string]: string } = {
+        'low': 'Низкая',
+        'medium': 'Средняя',
+        'high': 'Высокая'
+    };
+    return urgencies[urgency] || urgency;
+};
 
 interface MapComponentProps {
   requests: Request[];
@@ -276,6 +328,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const [userMarker, setUserMarker] = useState<L.Marker | null>(null);
   const [locationInitialized, setLocationInitialized] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [canHelp, setCanHelp] = useState<boolean>(false);
+  const [isNotificationsPanelOpen, setIsNotificationsPanelOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const handleZoomIn = () => {
     if (mapRef.current) {
@@ -363,91 +419,190 @@ const MapComponent: React.FC<MapComponentProps> = ({
     }
   };
 
-  const handleHelpProvided = async (requestId: number) => {
-    if (!userId || userId === 0) {
-      console.error('UserId is invalid:', userId);
-      alert('Ошибка: пользователь не авторизован. Пожалуйста, войдите снова.');
-      window.location.href = '/login';
-      return;
-    }
-
+  // Проверяем, может ли пользователь помочь с запросом
+  const checkCanHelp = async (requestId: number) => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('Ошибка: токен не найден. Пожалуйста, войдите снова.');
-        window.location.href = '/login';
-        return;
-      }
-
-      console.log('Sending help provided request with userId:', userId);
-      
-      const response = await axios.post(
-        `http://localhost:8080/api/requests/${requestId}/help`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-        }
+      const response = await axios.get(
+        `http://localhost:8080/api/requests/${requestId}/can-help?userId=${userId}`
       );
-      
-      console.log('Response:', response.data);
-      onRequestAdded();
-      setIsSelectingLocation(false);
-      setSelectedPosition(null);
-      setDescription('');
-      setCategory('');
-      setUrgency('low');
-      
-      alert('Помощь успешно оказана!');
-    } catch (error: any) {
-      console.error('Ошибка при оказании помощи:', error);
-      console.error('Детали ошибки:', error.response?.data);
-      
-      if (error.response?.status === 401 || error.response?.status === 403) {
-        alert('Сессия истекла. Пожалуйста, войдите снова.');
-        window.location.href = '/login';
-        return;
-      }
-      
-      alert('Ошибка при оказании помощи: ' + (error.response?.data || error.message));
+      setCanHelp(response.data.canHelp);
+    } catch (error) {
+      console.error('Error checking if user can help:', error);
+      setCanHelp(false);
     }
   };
 
-  const handleDeleteRequest = async (requestId: number) => {
+  // Обработчик отклика на запрос
+  const handleRespondToRequest = async (requestId: number) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        alert('Ошибка: токен не найден. Пожалуйста, войдите снова.');
+        alert('Необходимо войти в систему');
         window.location.href = '/login';
         return;
       }
 
-      const response = await axios.delete(
-        `http://localhost:8080/api/requests/${requestId}`,
+      await axios.post(
+        `http://localhost:8080/api/requests/${requestId}/help`,
+        null,
         {
+          params: { userId },
           headers: {
-            Authorization: `Bearer ${token}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
-          },
+          }
         }
       );
-      
-      console.log('Response:', response.data);
+
+      // Обновляем список запросов
       onRequestAdded();
-      alert('Запрос успешно удален!');
-    } catch (error: any) {
-      console.error('Ошибка при удалении запроса:', error);
-      
-      if (error.response?.status === 401 || error.response?.status === 403) {
-        alert('Сессия истекла. Пожалуйста, войдите снова.');
-        window.location.href = '/login';
-        return;
+
+      // Закрываем попап
+      if (mapRef.current) {
+        mapRef.current.closePopup();
       }
-      
-      alert('Ошибка при удалении запроса: ' + (error.response?.data || error.message));
+    } catch (error: any) {
+      console.error('Error responding to request:', error);
+      alert(error.response?.data || 'Произошла ошибка при отклике на запрос');
     }
+  };
+
+  // Обработчик завершения помощи
+  const handleCompleteHelp = async (requestId: number) => {
+    try {
+      setIsLoading(true);
+      await axios.put(
+        `http://localhost:8080/api/requests/${requestId}/complete-help?helperId=${userId}`
+      );
+      // Обновляем список запросов после завершения помощи
+      await onRequestAdded();
+      // Закрываем попап после успешного завершения
+      if (mapRef.current) {
+        mapRef.current.closePopup();
+      }
+    } catch (error: any) {
+      alert('Ошибка при завершении помощи: ' + error.response?.data || error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Обработчик отмены помощи
+  const handleCancelHelp = async (requestId: number) => {
+    try {
+      setIsLoading(true);
+      await axios.put(
+        `http://localhost:8080/api/requests/${requestId}/cancel-help?helperId=${userId}`
+      );
+      // Обновляем список запросов после отмены помощи
+      await onRequestAdded();
+      // Закрываем попап после успешной отмены
+      if (mapRef.current) {
+        mapRef.current.closePopup();
+      }
+    } catch (error: any) {
+      alert('Ошибка при отмене помощи: ' + error.response?.data || error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Обработчик перехода в чат
+  const handleOpenChat = (requestId: number) => {
+    // TODO: Реализовать переход в чат
+    alert('Функционал чата находится в разработке');
+  };
+
+  // Обработчик удаления запроса
+  const handleDeleteRequest = async (requestId: number) => {
+    try {
+      setIsLoading(true);
+      await axios.delete(
+        `http://localhost:8080/api/requests/${requestId}?userId=${userId}`
+      );
+      // Обновляем список запросов после удаления
+      await onRequestAdded();
+      // Закрываем попап после успешного удаления
+      if (mapRef.current) {
+        mapRef.current.closePopup();
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Неизвестная ошибка при удалении запроса';
+      alert(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Обновляем функцию отображения попапа запроса
+  const renderRequestPopup = (request: Request) => {
+    const isCreator = request.userId === userId;
+    const isHelper = request.helpHistory?.some(
+      history => history.helper.id === userId && history.status === 'IN_PROGRESS'
+    );
+
+    return (
+      <div className="request-popup">
+        <h3>{getCategoryLabel(request.category)}</h3>
+        <div className="description">
+          <strong>Описание:</strong>
+          <p>{request.description}</p>
+        </div>
+        <div className="user-info">
+          <strong>Создал:</strong> {request.userName}
+        </div>
+        <div className="status">
+          <strong>Статус:</strong> {getStatusLabel(request.status)}
+        </div>
+        {request.urgency && (
+          <div className={`urgency ${request.urgency}`}>
+            <strong>Срочность:</strong> {getUrgencyLabel(request.urgency)}
+          </div>
+        )}
+        
+        {request.helpHistory && request.helpHistory.length > 0 && (
+          <div className="helpers-info">
+            <div className="responses-count">
+              <strong>Откликнулись:</strong> {request.helpHistory.filter(h => h.status === 'IN_PROGRESS').length} человек
+            </div>
+            <div className="helpers-list">
+              <ul>
+                {request.helpHistory
+                  .filter(h => h.status === 'IN_PROGRESS')
+                  .map(h => (
+                    <li key={h.helper.id}>{h.helper.name}</li>
+                  ))}
+              </ul>
+            </div>
+          </div>
+        )}
+
+        <div className="button-group">
+          {!isCreator && !isHelper && (
+            <button className="help-button" onClick={() => handleRespondToRequest(request.id)}>
+              Откликнуться
+            </button>
+          )}
+          
+          {isHelper && (
+            <>
+              <button className="complete-help-button" onClick={() => handleCompleteHelp(request.id)}>
+                Помощь оказана
+              </button>
+              <button className="cancel-help-button" onClick={() => handleCancelHelp(request.id)}>
+                Не смогу помочь
+              </button>
+            </>
+          )}
+
+          {isCreator && (
+            <button className="delete-button" onClick={() => handleDeleteRequest(request.id)}>
+              Удалить запрос
+            </button>
+          )}
+        </div>
+      </div>
+    );
   };
 
   // Функция для определения местоположения
@@ -618,16 +773,56 @@ const MapComponent: React.FC<MapComponentProps> = ({
     }
   }, [selectedRequest]);
 
+  // Добавляем функцию для получения количества непрочитанных уведомлений
+  const fetchUnreadCount = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8080/api/notifications/user/${userId}/unread/count`);
+      setUnreadCount(response.data);
+    } catch (error) {
+      console.error('Error fetching unread count:', error);
+    }
+  };
+
+  // Добавляем useEffect для периодического обновления счетчика
+  useEffect(() => {
+    if (userId) {
+      fetchUnreadCount();
+      const interval = setInterval(fetchUnreadCount, 30000); // Обновляем каждые 30 секунд
+      return () => clearInterval(interval);
+    }
+  }, [userId]);
+
   return (
     <div style={{ position: 'relative', height: '100%', width: '100%', flex: 1 }}>
       {!isSelectingLocation && (
-        <button 
-          onClick={handleStartLocationSelect}
-          className="create-request-button"
-        >
-          Создать запрос
-        </button>
+        <>
+          <button 
+            onClick={handleStartLocationSelect}
+            className="create-request-button"
+          >
+            Создать запрос
+          </button>
+
+          <button
+            onClick={() => setIsNotificationsPanelOpen(true)}
+            className="notifications-button"
+          >
+            <FontAwesomeIcon icon={faBell} />
+            {unreadCount > 0 && (
+              <span className="notifications-badge">{unreadCount}</span>
+            )}
+          </button>
+        </>
       )}
+
+      <NotificationsPanel
+        isOpen={isNotificationsPanelOpen}
+        onClose={() => {
+          setIsNotificationsPanelOpen(false);
+          fetchUnreadCount(); // Обновляем счетчик при закрытии панели
+        }}
+        userId={userId}
+      />
 
       <div className="custom-zoom-control">
         <button onClick={handleZoomIn}>+</button>
@@ -690,61 +885,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                   icon={markerIcon}
                 >
                   <Popup>
-                    <div className="request-popup">
-                      <h3>
-                        <FontAwesomeIcon icon={mainCategory?.icon || faQuestion} />
-                        {mainCategory?.label || 'Неизвестная категория'}
-                      </h3>
-                      
-                      <div className="category-info">
-                        <FontAwesomeIcon icon={faTag} />
-                        Категория: {mainCategory?.label}
-                      </div>
-                      
-                      <div className="description">
-                        <strong>Описание:</strong>
-                        <p>{request.description}</p>
-                      </div>
-                      
-                      <div className="user-info">
-                        <FontAwesomeIcon icon={faUser} /> Автор: {request.userName}
-                      </div>
-                      
-                      <div className="status">
-                        <FontAwesomeIcon icon={faInfoCircle} /> Статус: {
-                          request.status === 'ACTIVE' ? 'Активный' :
-                          request.status === 'COMPLETED' ? 'Выполнен' : 
-                          request.status
-                        }
-                      </div>
-                      
-                      {request.urgency && (
-                        <div className={`urgency ${request.urgency}`}>
-                          <FontAwesomeIcon icon={faExclamationTriangle} /> Срочность: {
-                            request.urgency === 'low' ? 'Низкая' :
-                            request.urgency === 'medium' ? 'Средняя' : 'Высокая'
-                          }
-                        </div>
-                      )}
-                      
-                      {request.status === 'ACTIVE' && (
-                        request.userId === userId ? (
-                          <button 
-                            className="delete-button"
-                            onClick={() => handleDeleteRequest(request.id)}
-                          >
-                            <FontAwesomeIcon icon={faTrash} /> Удалить запрос
-                          </button>
-                        ) : (
-                          <button 
-                            className="help-button"
-                            onClick={() => handleHelpProvided(request.id)}
-                          >
-                            <FontAwesomeIcon icon={faCheck} /> Помощь оказана
-                          </button>
-                        )
-                      )}
-                    </div>
+                    {renderRequestPopup(request)}
                   </Popup>
                 </Marker>
               );

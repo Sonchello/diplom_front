@@ -16,6 +16,20 @@ interface Request {
   userName: string;
   userId: number;
   createdAt: string;
+  activeHelper?: { 
+    id: number;
+    name?: string;
+  };
+  helpHistory?: { 
+    id: number;
+    helper: { 
+      id: number;
+      name?: string;
+    };
+    status: string;
+    startDate: string;
+    endDate?: string;
+  }[];
 }
 
 interface User {
@@ -145,20 +159,56 @@ const MainPage: React.FC = () => {
 
         setIsLoading(true);
         
-        // Параллельная загрузка данных пользователя и запросов
-        const [userResponse, requestsResponse] = await Promise.all([
-          axios.get('http://localhost:8080/api/users/current', {
-            headers: { Authorization: `Bearer ${token}` },
-            params: { email },
-          }),
+        // Сначала получаем данные пользователя
+        const userResponse = await axios.get('http://localhost:8080/api/users/current', {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { email },
+        });
+
+        console.log('Current user:', userResponse.data);
+        setCurrentUser(userResponse.data);
+
+        // Затем загружаем запросы
+        const [requestsResponse, userRequestsResponse, activeHelpResponse] = await Promise.all([
           axios.get('http://localhost:8080/api/requests/active', {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`http://localhost:8080/api/requests/user/${userResponse.data.id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`http://localhost:8080/api/requests/user/${userResponse.data.id}/active-helps`, {
             headers: { Authorization: `Bearer ${token}` },
           })
         ]);
 
-        console.log('Current user:', userResponse.data);
-        setCurrentUser(userResponse.data);
-        setRequests(requestsResponse.data);
+        console.log('Active requests:', requestsResponse.data);
+        console.log('User requests:', userRequestsResponse.data);
+        console.log('Active help requests:', activeHelpResponse.data);
+        
+        // Объединяем все запросы
+        const allRequests = [
+          ...requestsResponse.data, 
+          ...userRequestsResponse.data,
+          ...activeHelpResponse.data
+        ];
+
+        // Удаляем дубликаты по id и добавляем userId из user объекта
+        const uniqueRequests = Array.from(
+          new Map(
+            allRequests.map(item => [
+              item.id, 
+              {
+                ...item,
+                userId: item.user?.id || null,
+                userName: item.user?.name || 'Аноним',
+                helpHistory: item.helpHistory || []
+              }
+            ])
+          ).values()
+        );
+        
+        console.log('Unique requests with userId and helpHistory:', uniqueRequests);
+        setRequests(uniqueRequests);
       } catch (error) {
         console.error('Ошибка загрузки данных:', error);
         localStorage.removeItem('token');
@@ -170,16 +220,41 @@ const MainPage: React.FC = () => {
     };
 
     loadData();
-  }, [navigate]); // Добавляем navigate в зависимости
+  }, [navigate]);
 
   const handleRequestAdded = async () => {
-    const token = localStorage.getItem('token');
-    const requestsResponse = await axios.get('http://localhost:8080/api/requests/active', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    setRequests(requestsResponse.data);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token || !currentUser) return;
+
+      const [requestsResponse, userRequestsResponse] = await Promise.all([
+        axios.get('http://localhost:8080/api/requests/active', {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        axios.get(`http://localhost:8080/api/requests/user/${currentUser.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+      ]);
+
+      // Объединяем активные запросы и запросы пользователя
+      const allRequests = [...requestsResponse.data, ...userRequestsResponse.data];
+      // Удаляем дубликаты по id и добавляем userId и userName
+      const uniqueRequests = Array.from(
+        new Map(
+          allRequests.map(item => [
+            item.id,
+            {
+              ...item,
+              userId: item.user?.id || null,
+              userName: item.user?.name || 'Аноним'
+            }
+          ])
+        ).values()
+      );
+      setRequests(uniqueRequests);
+    } catch (error) {
+      console.error('Ошибка при обновлении запросов:', error);
+    }
   };
 
   const handleUserUpdate = async () => {

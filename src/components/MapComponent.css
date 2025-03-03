@@ -415,132 +415,261 @@ body {
 
 /* Стили для попапа запроса */
 .request-popup {
-  background: rgba(0, 0, 0, 0.95);
-  padding: 20px;
-  border-radius: 12px;
-  color: #FFFFFF;
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: #FFFFFF !important;
+  padding: 40px !important;
+  border-radius: 15px !important;
+  color: #000000 !important;
+  min-width: 400px !important;
+  border: 2px solid #000000 !important;
 }
 
 .request-popup h3 {
-  color: #FFFFFF;
-  border-bottom: 2px solid #FFFFFF;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
+  color: #000000 !important;
+  font-size: 24px !important;
+  margin-bottom: 30px !important;
+  text-align: left !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  border-bottom: 2px solid #000000 !important;
+  padding-bottom: 15px !important;
+  font-weight: 600 !important;
 }
 
 .request-popup .category-info {
-  color: #FFFFFF;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 8px 15px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  margin: 15px 0;
+  background: #FFFFFF !important;
+  padding: 15px !important;
+  border-radius: 8px !important;
+  border: 2px solid #000000 !important;
+  margin: 15px 0 !important;
+  color: #000000 !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
 }
 
 .request-popup .description {
-  background: rgba(255, 255, 255, 0.08);
-  padding: 15px;
-  border-radius: 6px;
-  margin: 15px 0;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #FFFFFF !important;
+  padding: 15px !important;
+  border-radius: 8px !important;
+  margin: 15px 0 !important;
+  border: 2px solid #000000 !important;
 }
 
 .request-popup .description strong {
-  color: #FFFFFF;
-  display: block;
-  margin-bottom: 8px;
+  color: #000000 !important;
+  display: block !important;
+  margin-bottom: 10px !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
 }
 
 .request-popup .description p {
-  color: rgba(255, 255, 255, 0.9);
-  margin: 0;
-  line-height: 1.5;
+  color: #000000 !important;
+  margin: 0 !important;
+  line-height: 1.5 !important;
+  font-size: 16px !important;
 }
 
 .request-popup .user-info {
-  background: rgba(255, 255, 255, 0.08);
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #FFFFFF;
-  margin: 15px 0;
+  background: #FFFFFF !important;
+  padding: 15px !important;
+  border-radius: 8px !important;
+  border: 2px solid #000000 !important;
+  color: #000000 !important;
+  margin: 15px 0 !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
 }
 
 .request-popup .status {
-  display: inline-block;
-  padding: 8px 15px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #FFFFFF;
-  margin: 15px 0;
+  display: inline-block !important;
+  padding: 10px 20px !important;
+  border-radius: 8px !important;
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  margin: 15px 0 !important;
+  font-size: 16px !important;
+  border: 2px solid #000000 !important;
+  font-weight: 500 !important;
 }
 
 .request-popup .urgency {
-  display: inline-block;
-  padding: 8px 15px;
-  border-radius: 6px;
-  color: #FFFFFF;
-  font-weight: bold;
-  margin: 15px 0;
-  width: 100%;
-  text-align: center;
+  display: inline-block !important;
+  padding: 10px 20px !important;
+  border-radius: 8px !important;
+  color: #000000 !important;
+  font-weight: 600 !important;
+  margin: 15px 0 !important;
+  width: 100% !important;
+  text-align: center !important;
+  font-size: 16px !important;
+  border: 2px solid #000000 !important;
 }
 
 .request-popup .urgency.low {
-  background: rgba(255, 255, 255, 0.2);
+  background: #FFFFFF !important;
+  border-color: #28a745 !important;
+  color: #28a745 !important;
 }
 
 .request-popup .urgency.medium {
-  background: rgba(255, 255, 255, 0.4);
+  background: #FFFFFF !important;
+  border-color: #ffc107 !important;
+  color: #ffc107 !important;
 }
 
 .request-popup .urgency.high {
-  background: rgba(255, 255, 255, 0.6);
+  background: #FFFFFF !important;
+  border-color: #dc3545 !important;
+  color: #dc3545 !important;
+}
+
+.request-popup .button-group {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  margin-top: 20px !important;
+}
+
+.request-popup .help-button,
+.request-popup .chat-button,
+.request-popup .complete-help-button,
+.request-popup .cancel-help-button {
+  width: 100% !important;
+  padding: 15px !important;
+  border-radius: 8px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  border: none !important;
+  color: #FFFFFF !important;
 }
 
 .request-popup .help-button {
-  width: 100%;
-  padding: 12px;
-  background: transparent;
-  color: #FFFFFF;
-  border: 2px solid #FFFFFF;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 16px;
-  margin-top: 20px;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  background: #000000 !important;
 }
 
-.request-popup .help-button:hover {
-  background: #FFFFFF;
-  color: #000000;
-  transform: translateY(-2px);
+.request-popup .chat-button {
+  width: 100% !important;
+  padding: 15px !important;
+  margin-top: 10px !important;
+  background: #2196F3 !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
 }
 
-.request-popup .help-button:active {
-  transform: translateY(0);
+.request-popup .chat-button:hover {
+  background: #1976D2 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3) !important;
+}
+
+.request-popup .complete-help-button {
+  width: 100% !important;
+  padding: 15px !important;
+  margin-top: 15px !important;
+  background: #28a745 !important;
+  color: #FFFFFF !important;
+  border: 2px solid #28a745 !important;
+  border-radius: 8px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+}
+
+.request-popup .complete-help-button:hover {
+  background: #218838 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2) !important;
+}
+
+.request-popup .cancel-help-button {
+  width: 100% !important;
+  padding: 15px !important;
+  margin-top: 15px !important;
+  background: #dc3545 !important;
+  color: #FFFFFF !important;
+  border: 2px solid #dc3545 !important;
+  border-radius: 8px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+}
+
+.request-popup .cancel-help-button:hover {
+  background: #c82333 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2) !important;
+}
+
+.request-popup .completion-status {
+  text-align: center !important;
+  padding: 15px !important;
+  margin-top: 10px !important;
+  background: #E8F5E9 !important;
+  color: #2E7D32 !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  border: 2px solid #2E7D32 !important;
+}
+
+.request-popup .user-info div {
+  margin-top: 10px !important;
+}
+
+.request-popup .category-info {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 20px !important;
+  gap: 10px !important;
+}
+
+.request-popup .status,
+.request-popup .urgency {
+  flex: 1 !important;
+  text-align: center !important;
+  padding: 10px !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
 }
 
 /* Обновляем стили для контейнера попапа Leaflet */
 .leaflet-popup-content-wrapper {
-  background: rgba(0, 0, 0, 0.95);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.4);
+  background: #FFFFFF !important;
+  border-radius: 15px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  padding: 0 !important;
+  border: 2px solid #000000 !important;
 }
 
 .leaflet-popup-content {
-  background: transparent;
-  color: #FFFFFF;
+  margin: 0 !important;
+  width: auto !important;
 }
 
 .leaflet-popup-tip {
-  background: #000000;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: #FFFFFF !important;
+  border: 2px solid #000000 !important;
 }
 
 /* Стили для контента попапа */
@@ -643,30 +772,25 @@ body {
 }
 
 .request-popup .help-button {
-  width: 100%;
-  padding: 12px;
-  background-color: #86C232;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 16px;
-  margin-top: 20px;
-  transition: all 0.3s ease;
-  font-family: 'brandon-grotesque', 'Avenir Next', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
-  font-weight: 500;
+  width: 100% !important;
+  padding: 15px !important;
+  margin-top: 15px !important;
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  border: 2px solid #000000 !important;
+  border-radius: 8px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
 }
 
 .request-popup .help-button:hover {
-  background-color: #75a82b;
-  transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-
-.request-popup .help-button:active {
-  transform: translateY(0);
-  box-shadow: none;
+  background: #333333 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
 }
 
 /* Обновляем стили для маркера пользователя */
@@ -729,4 +853,72 @@ body {
 .request-popup .delete-button:active {
   transform: translateY(0);
   box-shadow: none;
+}
+
+.helpers-info {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+}
+
+.responses-count {
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 8px;
+}
+
+.helpers-list {
+  margin-top: 8px;
+}
+
+.helpers-list ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 8px 0 0 0;
+}
+
+.helpers-list li {
+  padding: 4px 8px;
+  margin: 4px 0;
+  background-color: rgba(0, 0, 0, 0.03);
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.notifications-button {
+  position: absolute;
+  top: 90px;
+  right: 20px;
+  z-index: 1000;
+  background-color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.notifications-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+}
+
+.notifications-button .notifications-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #dc3545;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  min-width: 18px;
+  text-align: center;
 }

@@ -57,12 +57,12 @@ public class UserService {
         // Проверяем существование пользователя
         User existingUser = userRepository.findById(user.getId())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-        
+
         // Обновляем только разрешенные поля
         existingUser.setName(user.getName());
         existingUser.setAvatarUrl(user.getAvatarUrl());
         existingUser.setBirthDate(user.getBirthDate());
-        
+
         // Сохраняем обновленного пользователя
         return userRepository.save(existingUser);
     }
